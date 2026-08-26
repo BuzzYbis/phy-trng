@@ -1,0 +1,89 @@
+(* #"/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 8 0 8 31 *)
+
+let%span slib = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 9 14 9 21
+let%span slib'0 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 10 16 10 17
+let%span slib'1 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 14 16 14 63
+let%span slib'2 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 13 16 13 32
+let%span slib'3 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 12 16 12 37
+let%span slib'4 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 16 8 16 12
+let%span slib'5 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 16 15 16 16
+let%span slib'6 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 16 8 16 16
+let%span slib'7 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 17 13 17 14
+let%span slib'8 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 17 8 17 14
+let%span slib'9 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 5 11 5 23
+let%span slib'10 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 6 10 6 33
+let%span slib'11 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 7 10 7 66
+let%span sslice = "/Users/ugo/Info_projet_perso/creusot/creusot-std/src/std/slice.rs" 331 18 331 22
+let%span sord = "/Users/ugo/Info_projet_perso/creusot/creusot-std/src/logic/ord.rs" 22 8 22 20
+
+use creusot.slice.Slice64
+use creusot.int.UInt8
+use creusot.int.UInt64
+use seq.Seq
+use creusot.prelude.MutBorrow
+use creusot.prelude.Opaque
+use creusot.prelude.Any
+use int.Int
+
+let len_u8 (self_: Slice64.slice UInt8.t) (return (x: UInt64.t)) = any
+  [ return (result: UInt64.t) -> {[@stop_split] [@expl:len ensures] [%#sslice] Seq.length (Slice64.view self_)
+    = UInt64.t'int result}
+    (! return {result}) ]
+
+predicate resolve_refmut_slice_u8 [@inline:trivial] (_1: MutBorrow.t (Slice64.slice UInt8.t)) = _1.final = _1.current
+
+meta "rewrite_def" predicate resolve_refmut_slice_u8
+
+predicate gt_log_Int [@inline:trivial] (self: int) (other: int) = [%#sord] other < self
+
+meta "rewrite_def" predicate gt_log_Int
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let zero_slice [#"/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 8 0 8 31]
+  (v: MutBorrow.t (Slice64.slice UInt8.t)) (return (x: ())) =
+{[@stop_split] [@expl:zero_slice requires] [%#slib'9] gt_log_Int (Seq.length (Slice64.view v.current)) 0}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = len_u8 [%#slib] {v.current} (fun (_x: UInt64.t) -> [ &len <- _x ] s1)
+    | s1 = [ &i <- [%#slib'0] (0: UInt64.t) ] s2
+    | s2 = [ &_old <- v.final ] s3
+    | s3 = bb2 ]
+  | bb2 = bb2
+    [ bb2 = {[@expl:inferred invariant: unchanged value] _old = v.final}
+      {[@expl:loop invariant #0] [%#slib'3] 0 <= UInt64.t'int i /\ UInt64.t'int i <= UInt64.t'int len}
+      {[@expl:loop invariant #1] [%#slib'2] Seq.length (Slice64.view v.current) = UInt64.t'int len}
+      {[@expl:loop invariant #2] [%#slib'1] forall j: int. 0 <= j /\ j < UInt64.t'int i
+        -> UInt8.t'int (Seq.get (Slice64.view v.current) j) = 0}
+      (! s0)
+      [ s0 = [ &_22 <- UInt64.lt i len ] s1 | s1 = any [ br0 -> {_22 = false} (! bb6) | br1 -> {_22} (! bb4) ] ]
+      [ bb4 = s0
+        [ s0 = [ &_25 <- i ] s1
+        | s1 = Opaque.fresh_ptr
+            (fun (_ptr: Opaque.ptr) -> -{Slice64.slice_ptr_len _ptr = Slice64.length v.current}- [ &_26 <- _ptr ] s2)
+        | s2 = [ &_27 <- Slice64.slice_ptr_len _26 ] s3
+        | s3 = [ &_28 <- UInt64.lt _25 _27 ] s4
+        | s4 = {[@expl:index in bounds] [%#slib'4] _28} s5
+        | s5 = Slice64.set [%#slib'6] <UInt8.t> {v.current} {_25} {[%#slib'5] (0: UInt8.t)}
+            (fun (r: Slice64.slice UInt8.t) -> [ &v <- { v with current = r } ] s6)
+        | s6 = UInt64.add [%#slib'8] {i} {[%#slib'7] (1: UInt64.t)} (fun (_x: UInt64.t) -> [ &i <- _x ] s7)
+        | s7 = bb2 ] ] ]
+  | bb6 = s0 [ s0 = -{resolve_refmut_slice_u8 v}- s1 | s1 = return {_ret} ] ]
+  [ & _ret: () = Any.any_l ()
+  | & v: MutBorrow.t (Slice64.slice UInt8.t) = v
+  | & len: UInt64.t = Any.any_l ()
+  | & i: UInt64.t = Any.any_l ()
+  | & _22: bool = Any.any_l ()
+  | & _25: UInt64.t = Any.any_l ()
+  | & _26: Opaque.ptr = Any.any_l ()
+  | & _27: UInt64.t = Any.any_l ()
+  | & _28: bool = Any.any_l ()
+  | & _old: Slice64.slice UInt8.t = Any.any_l () ])
+  [ return (result: ()) ->
+  {[@stop_split] [@expl:zero_slice ensures] ([@stop_split] [@expl:zero_slice ensures #0] [%#slib'10] Seq.length (Slice64.view v.final)
+      = Seq.length (Slice64.view v.current))
+    /\ ([@stop_split] [@expl:zero_slice ensures #1] [%#slib'11] forall i: int. 0 <= i
+        /\ i < Seq.length (Slice64.view v.current) -> UInt8.t'int (Seq.get (Slice64.view v.final) i) = 0)}
+    (! return {result}) ]

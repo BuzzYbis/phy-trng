@@ -1,0 +1,79 @@
+# ---------------------------------------------------------------------------- #
+#  Package Configuration                                                     - #
+# ---------------------------------------------------------------------------- #
+
+[package]
+name = "phy-trng"
+version = "0.1.0"
+edition = "2024"
+authors = ["BuzzY_ <contact@buzzybis.com>"]
+description = "Formally verified TRNG conditioning and extraction pipeline"
+license = "MIT"
+repository = "https://github.com/BuzzYbis/phy-trng"
+readme = "README.md"
+keywords = ["cryptography", "verification", "trng"]
+categories = ["cryptography", "no-std"]
+
+
+# ---------------------------------------------------------------------------- #
+# Dependencies                                                               - #
+# ---------------------------------------------------------------------------- #
+
+[dependencies]
+creusot-std = { version = "0.14.0-dev", default-features = false }
+
+
+# ---------------------------------------------------------------------------- #
+# Compiler & Linter Configuration                                            - #
+# ---------------------------------------------------------------------------- #
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(creusot)'] }
+
+[lints.clippy]
+# Lint groups
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = 0 }
+cargo = { level = "warn", priority = 0 }
+
+# Security, complexity, and no_std invariants
+cognitive_complexity = { level = "warn", priority = 1 }
+unwrap_used = { level = "warn", priority = 1 }
+expect_used = { level = "warn", priority = 1 }
+panic = { level = "warn", priority = 1 }
+float_arithmetic = { level = "warn", priority = 1 }
+
+
+# ---------------------------------------------------------------------------- #
+# Profiles                                                                   - #
+# ---------------------------------------------------------------------------- #
+
+[profile.dev]
+opt-level = 0
+debug = true
+debug-assertions = true
+overflow-checks = true
+incremental = true
+panic = "abort"
+
+[profile.test]
+opt-level = 1
+debug = true
+debug-assertions = true
+overflow-checks = true
+incremental = true
+
+[profile.release]
+opt-level = 3
+codegen-units = 1
+lto = "fat"
+overflow-checks = true
+panic = "abort"
+strip = "symbols"
+debug = false
+
+[profile.bench]
+opt-level = 3
+codegen-units = 1
+lto = "fat"
+debug = false
