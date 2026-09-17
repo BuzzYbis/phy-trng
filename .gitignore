@@ -1,4 +1,12 @@
 /target
-*.DS_Store
+
+# Separate verifier build output locations. Ordinary builds use target/ and
+# Creusot uses target/creusot/; a Verus location is added when Verus is pinned.
+/target-verus
+
+# Generated logs, proof summaries, images and provenance.
+/artifacts
+
+**/*.DS_Store
 
 /references

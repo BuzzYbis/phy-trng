@@ -16,6 +16,24 @@ categories = ["cryptography", "no-std"]
 
 
 # ---------------------------------------------------------------------------- #
+# Workspace                                                                  - #
+# ---------------------------------------------------------------------------- #
+#
+# `resolver = "3"` is the edition-2024 default and is stated explicitly so that
+# adding `[workspace]` does not silently change dependency resolution.
+#
+# `default-members` selects default build targets only. It is not a verifier or
+# dependency-resolution firewall, so CI selects packages explicitly (see
+# `ci/README.md`). Planned members that do not exist yet are listed in
+# `doc/REPOSITORY_STATUS.md`; empty placeholder crates are not created.
+
+[workspace]
+resolver = "3"
+members = [".", "crates/driver-api"]
+default-members = [".", "crates/driver-api"]
+
+
+# ---------------------------------------------------------------------------- #
 # Dependencies                                                               - #
 # ---------------------------------------------------------------------------- #
 
@@ -26,11 +44,39 @@ creusot-std = { version = "0.14.0-dev", default-features = false }
 # ---------------------------------------------------------------------------- #
 # Compiler & Linter Configuration                                            - #
 # ---------------------------------------------------------------------------- #
+#
+# The lint set is declared once at workspace level and inherited by every
+# member, so a new crate cannot silently adopt a weaker bar.
 
-[lints.rust]
+[lints]
+workspace = true
+
+# Hardness is set in one place. Every entry below is `warn`; the `-D warnings`
+# in `makefile` and `ci/test-host.sh` promotes all of them to hard errors. A
+# developer can therefore iterate locally while the gate stays absolute, and
+# nothing has to be re-levelled to tighten CI.
+
+[workspace.lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(creusot)'] }
 
-[lints.clippy]
+# Controlled unsafe. Only the HAL, crypto FFI, synchronization/zeroization
+# primitives and seL4 glue may use it. Those crates carry a crate-root
+# `#![allow(unsafe_code, reason = "...")]` plus an entry in `proofs/tcb.md`,
+# and `ci/check-trust.sh` fails on any occurrence missing from the inventory.
+unsafe_code = "warn"
+
+# The public API of a reviewability target is documented.
+missing_docs = "warn"
+
+# Homoglyph and confusable-identifier hardening.
+non_ascii_idents = "warn"
+
+# Casts that do nothing, and `pub` items unreachable from the crate root.
+trivial_casts = "warn"
+trivial_numeric_casts = "warn"
+unreachable_pub = "warn"
+
+[workspace.lints.clippy]
 # Lint groups
 all = { level = "warn", priority = -1 }
 pedantic = { level = "warn", priority = 0 }
@@ -43,10 +89,43 @@ expect_used = { level = "warn", priority = 1 }
 panic = { level = "warn", priority = 1 }
 float_arithmetic = { level = "warn", priority = 1 }
 
+# `no_std`, allocation-free. Reaching through `std` in a crate that must build
+# for a protection domain is a break waiting for the target to exist, so it is
+# caught on the host instead of at cross-compilation time.
+std_instead_of_core = { level = "warn", priority = 1 }
+std_instead_of_alloc = { level = "warn", priority = 1 }
+alloc_instead_of_core = { level = "warn", priority = 1 }
+
+# Fail closed: no stub or abort path reaches a gate. Together with `panic`,
+# `unwrap_used` and `expect_used` above, this covers the panicking surface.
+todo = { level = "warn", priority = 1 }
+unimplemented = { level = "warn", priority = 1 }
+unreachable = { level = "warn", priority = 1 }
+exit = { level = "warn", priority = 1 }
+
+# Zeroization discipline: `mem::forget` skips `Drop` and silently defeats a
+# scrubbing wrapper.
+mem_forget = { level = "warn", priority = 1 }
+
+# Every suppression states why. Prefer `#[expect]` over `#[allow]`: it fails
+# once the suppression is no longer needed, so a stale one cannot outlive the
+# problem it hid.
+allow_attributes_without_reason = { level = "warn", priority = 1 }
+
+# No cast without a written reason. `pedantic` already denies every lossy cast
+# (`cast_possible_truncation`, `cast_sign_loss`, `cast_possible_wrap`,
+# `cast_precision_loss`, `cast_lossless`), so this adds only the provably
+# lossless ones. That is the point: it turns "this cast is fine" from a
+# reader's assumption into a recorded justification, the same discipline
+# `proofs/tcb.md` applies to trusted code.
+as_conversions = { level = "warn", priority = 1 }
+
 
 # ---------------------------------------------------------------------------- #
 # Profiles                                                                   - #
 # ---------------------------------------------------------------------------- #
+#
+# Profiles are a root-only setting and therefore apply to every member.
 
 [profile.dev]
 opt-level = 0

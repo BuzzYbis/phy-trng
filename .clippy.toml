@@ -1,1 +1,8 @@
 cognitive-complexity-threshold = 10
+
+# Production paths keep the `panic`, `unwrap_used` and `expect_used` bar from
+# the workspace lint table: these relaxations apply to test code only, where a
+# failed assertion is the intended outcome.
+allow-panic-in-tests = true
+allow-unwrap-in-tests = true
+allow-expect-in-tests = true
