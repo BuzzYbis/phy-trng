@@ -18,6 +18,7 @@ pub fn zero_slice(v: &mut [u8]) {
     }
 }
 
+
 #[cfg(test)]
 mod tests {
     use super::*;
