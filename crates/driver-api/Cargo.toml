@@ -1,0 +1,25 @@
+# ---------------------------------------------------------------------------- #
+#  Package Configuration                                                     - #
+# ---------------------------------------------------------------------------- #
+#
+# Shared frame-handoff vocabulary between the camera producer and the entropy
+# consumer. Plain `no_std` Rust with no dependencies: this package must not
+# depend on Creusot or on Verus, because both proof domains compile it as part
+# of their own verified implementation graph.
+
+[package]
+name = "driver-api"
+version = "0.1.0"
+edition = "2024"
+authors = ["BuzzY_ <contact@buzzybis.com>"]
+description = "Frame-handoff transport types, numeric tags and protocol constants"
+license = "MIT"
+repository = "https://github.com/BuzzYbis/phy-trng"
+readme = "README.md"
+keywords = ["no-std", "camera", "protocol", "verification"]
+categories = ["embedded", "no-std"]
+
+[dependencies]
+
+[lints]
+workspace = true

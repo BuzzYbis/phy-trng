@@ -1,12 +1,12 @@
 # Phy-TRNG — Roadmap
 
-**Version 0.3 — second-review revision. Design specification; no implementation, proof, measurement or certification result is asserted.**
+**Version 0.3.1 — second-review revision with editorial corrections (ARCHITECTURE §13.2). Design specification; no implementation, proof, measurement or certification result is asserted.**
 
 ## Capacity and status
 
 One developer, about 10 effective hours per productive week and 44 productive weeks/year: approximately 440 h/year. The specified baseline is **940 h =94 productive weeks ≈25.6 calendar months**. This is a provisional implementation/analysis estimate, not a promised evaluation date. Reviewer availability, hardware changes, campaigns and unresolved Stage 1/Stage 2 analysis may extend it.
 
-Sixteen paired milestone documents retain M0–M7 identifiers. Each gate references the canonical benchmark registry. None of the figures below means work has already been completed.
+Sixteen paired milestone documents retain M0–M7 identifiers. Each gate references the canonical benchmark registry. None of the figures below means work has already been completed. Productive week 1 is not anchored to a calendar date; the current state of M0 artifacts is recorded in [REPOSITORY_STATUS.md §1.1](REPOSITORY_STATUS.md#11-m0-artifacts-named-in-the-specification).
 
 ## Sequence
 
@@ -23,7 +23,7 @@ Sixteen paired milestone documents retain M0–M7 identifiers. Each gate referen
 
 ## M0 — feasibility first
 
-Five probes: sensor access (18 h), DMA/time-service feasibility (14 h), primitive/backend/oracle support (18 h), hardest proof/transport signature (14 h), physical freshness feasibility (8 h), plus 8 h minimum scaffolding/review setup. Choose one reference profile; label other targets compile-only until qualified. Secure independent reviewers for the gate-active assumption, physical and cryptographic arguments early.
+Five probes: sensor access (18 h), DMA/time-service feasibility (14 h), primitive/backend/oracle support (18 h), hardest proof/transport signature (14 h), physical freshness feasibility (8 h), plus 8 h minimum scaffolding/review setup. Choose one reference profile; label other targets compile-only until qualified. Secure independent reviewers for the gate-active assumption, physical and cryptographic arguments early. Complete the Verus/Microkit compatibility experiment ([REPOSITORY_AND_PROOF_SETUP.md §6.3](REPOSITORY_AND_PROOF_SETUP.md#63-mandatory-compatibility-experiment)) and fold Verus driver-proof effort into the G0 reforecast.
 
 No optional backend becomes an unconditional later gate. A failed sensor probe needs a verified alternative before qualified acquisition, not just an order receipt. Probe code may be discarded.
 
@@ -45,7 +45,7 @@ Freeze the actual input/output block lengths, bottleneck dimensions, rate target
 
 ## M4 — one-target implementation
 
-Core, sequential ring, selected map, two generator states, three tagged accounts, byte API and local release model. Real vectors/reference transitions replace the invalid idea of measuring seed-state entropy from output. All mandatory local proof obligations must discharge.
+Core, sequential ring, selected map, two generator states, three tagged accounts, byte API and local release model. Seeding is checked with real vectors and reference transitions; output statistics never measure seed-state entropy. All mandatory local proof obligations must discharge.
 
 The explicit test-only issuer makes early output checks possible; those results are not production health/release qualification. Record four boundary rates and buffered latency separately. Accept zero-byte calls as no-op and requests up to 65,536 bytes only when eligible; count generated/discarded bits against refresh policy.
 
@@ -53,7 +53,7 @@ The explicit test-only issuer makes early output checks possible; those results 
 
 Model-derived tests, uncertainty-aware defect mapping, snapshot-first handling, separate ICA/ORA and trusted receiver ledgers. Freeze detector observation horizons, clock/lease/propagation/commit bounds and finite outstanding permit budgets. Statistical detection does not become a structural zero-leakage guarantee merely because output is quarantined.
 
-Run predeclared confidence-bound campaigns. Schedule from window cadence: three million opportunities take 3.47 days at 100 ms, 34.72 days at 1 s or 347.22 days at 10 s. The former 'start by week 60' rule is replaced by a calculated latest start that fits G5. Revise the detector/claim/schedule before acquisition if that plan is impossible. A weaker measured bound does not silently pass.
+Run predeclared confidence-bound campaigns. Schedule from window cadence: three million opportunities take 3.47 days at 100 ms, 34.72 days at 1 s or 347.22 days at 10 s. Start the campaign no later than the calculated latest start that still fits G5. Revise the detector/claim/schedule before acquisition if that plan is impossible. A weaker measured bound does not silently pass.
 
 ## M6 — actual deployment
 
@@ -72,7 +72,7 @@ All nine independent arguments must be accepted. Rebuild final artifacts, replay
 | Dependency | Planning rule |
 |---|---|
 | Independent review | Reserve reviewers at M0; scope and accepted dispositions at each gate |
-| Supported envelope | 54 explicit candidate cells; no invented 25-cell budget |
+| Supported envelope | 54 explicit candidate cells; reductions only by approved, documented exclusion |
 | Source settling/warming | Measured trajectory/equilibration controls define usable captures |
 | False alarms | Opportunities × cadence, with dependence and acceptance plan specified |
 | Startup detection | 2,995 zero-miss trials per selected class by default; include reset/rig turnaround |

@@ -1,12 +1,12 @@
 # M5 — Benchmarks
 
-**Version 0.3 — second-review revision. Design specification; no implementation, proof, measurement or certification result is asserted.**
+**Version 0.3.1 — second-review revision with editorial corrections (ARCHITECTURE §13.2). Design specification; no implementation, proof, measurement or certification result is asserted.**
 
 **Gate:** G5 · **Paired design:** [M5-architecture.md](M5-architecture.md)
 
 ## Gate scope
 
-Predeclare statistical counts/stopping rules and separate worst entropy, false-alarm and detection scenarios. The lower success formula is 0.05^(1/n), not its complement. Observation horizon and t_fault/t_alarm/t_close scope must be visible in every release report.
+Predeclare statistical counts/stopping rules and separate worst entropy, false-alarm and detection scenarios. The zero-failure lower success bound is 0.05^(1/n) (BENCHMARKS §1). Observation horizon and t_fault/t_alarm/t_close scope must be visible in every release report.
 
 All prior applicable blocking results remain required. Check transitive content/configuration dependencies before reuse. A pending analytic argument or incomplete mandatory proof cannot pass through a numeric benchmark.
 
@@ -74,7 +74,7 @@ All prior applicable blocking results remain required. Check transitive content/
 
 ### B-HLT-06 — 90B RCT/APT
 
-**Method:** Define sample alphabet, entropy estimate, cutoff convention, window and per-opportunity event unit for each test. Use the exact standard algorithms including startup/continuous behavior. Publish counts, bounds and dependence assumptions. Very low false-alarm rates are allowed. RCT/APT complement the source-model online tests; they do not replace them.
+**Method:** Define sample alphabet, entropy estimate, cutoff convention, window and per-opportunity event unit for each test. Use the exact standard algorithms including startup/continuous behavior. Publish counts, bounds and dependence assumptions. Very low false-alarm rates are allowed. RCT/APT complement the source-model online tests; they do not replace them. For alpha=2^-20 (~9.537×10^-7), a one-sided 95% upper bound with zero alarms requires at least n≥3,141,252 independent opportunities (more than B-HLT-04's 3,000,000 default for 10^-6); predeclare n and any allowed-alarm plan accordingly.
 
 **Artifact:** `bench/b-hlt-06.json` · **Tier:** Campaign.
 
@@ -165,7 +165,7 @@ Planned project commands (to be implemented, not claimed to exist yet):
 ```sh
 make bench PROFILE=reference MILESTONE=M5
 make verify PROFILE=reference
-make gate G5 PROFILE=reference
+make gate GATE=G5 PROFILE=reference
 ```
 
 A gate fails on missing, failed, stale or pending applicable blocking evidence. Profile-approved not-applicable results require the registry applicability rule. The complete shared definitions are in [BENCHMARKS.md](BENCHMARKS.md).

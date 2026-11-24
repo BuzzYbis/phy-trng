@@ -1,6 +1,6 @@
 # M1 — Benchmarks
 
-**Version 0.3 — second-review revision. Design specification; no implementation, proof, measurement or certification result is asserted.**
+**Version 0.3.1 — second-review revision with editorial corrections (ARCHITECTURE §13.2). Design specification; no implementation, proof, measurement or certification result is asserted.**
 
 **Gate:** G1 · **Paired design:** [M1-architecture.md](M1-architecture.md)
 
@@ -84,7 +84,7 @@ Planned project commands (to be implemented, not claimed to exist yet):
 ```sh
 make bench PROFILE=reference MILESTONE=M1
 make verify PROFILE=reference
-make gate G1 PROFILE=reference
+make gate GATE=G1 PROFILE=reference
 ```
 
 A gate fails on missing, failed, stale or pending applicable blocking evidence. Profile-approved not-applicable results require the registry applicability rule. The complete shared definitions are in [BENCHMARKS.md](BENCHMARKS.md).

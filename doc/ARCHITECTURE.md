@@ -1,8 +1,10 @@
 # Phy-TRNG — Architecture
 
-**Version 0.3 — second-review revision. Design specification; no implementation, proof, measurement or certification result is asserted.**
+**Version 0.3.1 — second-review revision with editorial corrections (ARCHITECTURE §13.2). Design specification; no implementation, proof, measurement or certification result is asserted.**
 
 > A `no_std`, allocation-free physical RNG research and engineering project targeting AIS 31 PTG.3, with a separately instantiated DRG.4 consumer interface and a seL4 deployment. Assurance is stated per layer and per supported build profile.
+>
+> Terms, abbreviations and identifier prefixes (PTG.3, DRG.4, T_irn, ICA/ORA, B-ARG-…) are defined in the [glossary](GLOSSARY.md).
 
 ## 1. Scope, claims and decision status
 
@@ -87,18 +89,22 @@ For the explicit PTG.3.5 claim, account for the latest intermediate input as req
 
 ### 4.2 Illustrative rate calculation — not frozen parameters
 
+The sensor figures are those of the selected reference target ([REPOSITORY_AND_PROOF_SETUP.md](REPOSITORY_AND_PROOF_SETUP.md) §1): Raspberry Pi 4 with a colour Sony IMX296. The credit, ratio and block values are illustrations.
+
 | Quantity | Illustration |
 |---|---|
-| Sensor / ROI | 1920×1080 at 30 fps, 1 pixel in 32, one selected bit |
-| Raw rate | 1,944,000 bit/s |
+| Sensor / ROI | IMX296, 1456×1088 RAW10 at the 60 fps target (16.67 ms frame cadence), 1 pixel in 32, one selected bit |
+| Raw rate | 2,970,240 bit/s |
 | Runtime credit | 0.01 entropy bit/raw bit |
-| Credited entropy flux | 19,440 entropy bit/s |
-| Stage 1 candidate | `r_ext = 50`, intermediate 38,880 bit/s, `v_m = 0.5` subject to B-ARG-01 |
+| Credited entropy flux | ≈29,702 entropy bit/s |
+| Stage 1 candidate | `r_ext = 50`, intermediate ≈59,405 bit/s, `v_m = 0.5` subject to B-ARG-01 |
 | Stage 2 candidate | `n_int = 512`, `m_ptg = 256`, `c_rate = 2`; **unqualified until B-ARG-09** |
-| Ideal budget envelope at `v_out = 0.98` | 19,440/0.98 ≈19,837 output bit/s, before losses |
+| Ideal budget envelope at `v_out = 0.98` | 29,702/0.98 ≈30,309 output bit/s, before losses |
 | PTG.3 engineering aspiration | 16 kbit/s; G3 derives and freezes the attainable qualified target |
 
 The budget envelope is a limit of the proposed credit policy, not a measured upper bound on physical entropy. Exceeding it invalidates that justification; it does not demonstrate creation of entropy. G3 may require more input, a wider state, output truncation or a lower rate. Startup inventory and finite measurement windows are reconciled separately from steady-state rate.
+
+The 60 fps cadence and the in-memory RAW10 packing are validation obligations, not datasheet facts. The sensor carries a Bayer colour filter array, so R, G and B pixels differ in gain and illumination response; B-ARG-05 models each channel. The ROI rule names the channels it samples: a pixel stride that is even in both directions samples a single Bayer channel.
 
 ### 4.3 Stage 1 extraction routes
 
@@ -133,7 +139,15 @@ The restart process must represent actual use (90B §3.1.4); include startup inh
 
 Monitors detect identical frames, counter discontinuities, timeout, darkness, saturation and specified variance failures. Their reports name positive and negative cases. Option B authenticated physical freshness is an M0 feasibility study, not a shipped v1 feature.
 
-For each deployment target, either confine device DMA with an independently protected IOMMU/SMMU configuration or declare **A-DMA-1**: the driver/device are trusted for DMA and their compromise can invalidate system isolation. The untrusted driver must not own the authority to broaden its own DMA mappings. Record device stream IDs, all DMA-capable paths, protected tables and fault routing for an enforced profile.
+For each deployment target, either confine device DMA with an independently protected IOMMU/SMMU configuration or declare **A-DMA-1**: the driver/device are trusted for DMA and their compromise can invalidate system isolation. The untrusted driver must not own the authority to broaden its own DMA mappings. Record device stream IDs, all DMA-capable paths, protected tables and fault routing for an enforced profile. On Raspberry Pi 4 (BCM2711), no ARM SMMU confines Unicam CSI-2 DMA, so the Pi 4 profile defaults to **A-DMA-1** unless a platform with protected IOMMU/SMMU is selected.
+
+### 6.1 Claims under A-DMA-1
+
+Under A-DMA-1 the camera device, its DMA path and `pd_sensor` are trusted for memory integrity, not only for provenance. A faulty or compromised camera DMA path can write any physical memory: health snapshots, ICA/ORA ledgers, generator state, staging, release's commit buffer and kernel memory. The seL4 isolation guarantee itself assumes correct DMA.
+
+seL4 capabilities still confine the CPU-side behaviour of every other PD. The isolation claims therefore remain, each conditional on correct camera DMA: release confinement against a hostile generator (B-INT-01), hostile-transport safety (B-VER-09), snapshot binding (B-INT-11), anti-replay (B-VER-11) and release timing (B-PERF-11). None of them holds against a compromised camera driver or device. On such a profile, B-INT-10 is satisfied by the explicit A-DMA-1 declaration, never by an enforcement result. The guidance and ST state the narrowed claim.
+
+On Raspberry Pi 4 the VideoCore firmware also belongs to the supporting TCB: it boots the ARM cores and shares SDRAM with them.
 
 ## 7. Health authorizations and protected data transfer
 
@@ -249,9 +263,9 @@ The entropy boundary includes sensor, source, health, both generators and releas
 | Primitive implementation | Exactly the functional/leakage properties covered by the selected artifact |
 | Generator construction | Reviewed security argument under named cryptographic assumptions |
 | Physics | Conditional model-derived entropy supported by measurements |
-| Deployment | Composition under capability, hardware, timing and acquisition assumptions |
+| Deployment | Composition under capability, hardware, timing and acquisition assumptions; on an A-DMA-1 profile, also conditional on correct camera DMA (§6.1) |
 
-Creusot remains the selected contract-verification tool for deterministic Rust components and sequential models. Pin compatible Rust/Creusot, Why3 and solver versions, library specifications and proof sessions; replay from a clean checkout. Its proved model does not automatically cover interrupt ordering, FFI, DMA, physics or cryptographic hardness. M0 validates expressiveness before the implementation depends on a signature.
+Creusot remains the selected contract-verification tool for deterministic Rust components and sequential models. Pin compatible Rust/Creusot, Why3 and solver versions, library specifications and proof sessions; replay from a clean checkout. Its proved model does not automatically cover interrupt ordering, FFI, DMA, physics or cryptographic hardness. M0 validates expressiveness before the implementation depends on a signature. **Verus** owns the camera-driver protocol and buffer lifecycle (`crates/imx296-driver`), bridged manually to Creusot preconditions across [`proofs/contracts/frame-handoff.md`](../proofs/contracts/frame-handoff.md) with no automatic proof transfer between tools ([REPOSITORY_AND_PROOF_SETUP.md](REPOSITORY_AND_PROOF_SETUP.md)).
 
 All mandatory obligations must be discharged: no `admitted`, skipped, unresolved or timeout result may count as proof. A trusted boundary is separately listed and justified; it does not become a discharged proof by annotation. Coverage is a secondary metric. Track loop termination, failed-call effects, amount rounding, identifiers, buffer lifetime, range disjointness and release linearization explicitly.
 
@@ -266,7 +280,7 @@ The evidence matrix links requirement → argument/proof/test → code/configura
 | Decision | Status / gate |
 |---|---|
 | Min-entropy variant; separate PTG.3/DRG.4 states; byte API | Fixed for v1 |
-| Wax = zero credit; trusted acquisition plus bounded detectors | Fixed default; A-ACQ-1 |
+| Lava lamp (wax) = zero credit; trusted acquisition plus bounded detectors | Fixed default; A-ACQ-1 |
 | Per-target DMA enforcement or explicit trust | M0 choice, M6 qualification |
 | Stage 1 Route B candidate and source model | G2; numeric freeze may reopen at G3 |
 | Construction, exact primitive set, Stage 2 output proof, final dimensions | G3 |
@@ -275,7 +289,11 @@ The evidence matrix links requirement → argument/proof/test → code/configura
 | Reference target first, other targets explicitly qualified | M0 profile choice |
 | RO-jitter fallback | Separate source model/health/environmental budget; provisional +120 h |
 
-## 13. Second-review closure map
+## 13. Revision history
+
+### 13.1 v0.3: second-review closure map
+
+Findings of the second design review and how v0.3 resolves them. The review record itself is not part of this document set.
 
 | Finding | v0.3 resolution |
 |---|---|
@@ -288,4 +306,16 @@ The evidence matrix links requirement → argument/proof/test → code/configura
 | Optional backend blocks gate | Build-profile applicability matrix and independent-oracle fallback |
 | Timing and campaign assumptions | Buffered/uncached cases; formula-based campaign plan; 54 explicit envelope cells |
 
-Companion files: [benchmarks](BENCHMARKS.md), [gates](GATES.md), [roadmap](ROADMAP.md), and the offline [interactive pipeline explorer](pipeline-explorer.html). All milestone pairs are in this directory.
+### 13.2 v0.3.1: reference profile and editorial corrections
+
+No acceptance threshold, gate assignment or benchmark ID changed.
+
+| Area | Change |
+|---|---|
+| Reference profile | Raspberry Pi 4 + colour IMX296 recorded (§4.2, M1); the §4.2 illustration now uses its 2,970,240 bit/s raw rate; Bayer channel modeling made explicit |
+| DMA | Pi 4 defaults to A-DMA-1 (§6, M0, M6); new §6.1 states which isolation claims survive under A-DMA-1 |
+| Verification | Verus scope for the camera driver and its manual bridge to Creusot (§11) |
+| Registry | B-ENT-05 marked retired; B-VER-04 ≤12 baseline scoped to code-level entries; B-HLT-06 minimum n for alpha=2^-20 stated; ambient labels defined by measurement (BENCHMARKS §2) |
+| Wording | Planned `make gate GATE=G<n>` syntax, distinguished from the CI checks; references to superseded drafts replaced by the rules themselves; [glossary](GLOSSARY.md) added |
+
+Companion files: [glossary](GLOSSARY.md), [benchmarks](BENCHMARKS.md), [gates](GATES.md), [roadmap](ROADMAP.md), and the offline [interactive pipeline explorer](pipeline-explorer.html). All milestone pairs are in this directory.

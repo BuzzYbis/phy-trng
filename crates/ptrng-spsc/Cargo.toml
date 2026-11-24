@@ -1,0 +1,30 @@
+# ---------------------------------------------------------------------------- #
+#  Package Configuration                                                     - #
+# ---------------------------------------------------------------------------- #
+#
+# Bounded sequential ring buffer. Creusot owns this package; see
+# `proofs/creusot/coverage.md`.
+#
+# This is a *sequential cooperative* model. Cross-domain ordering and hostile
+# mutation belong to `ptrng-xfer`/`ptrng-sync` and are M6 obligations.
+
+[package]
+name = "ptrng-spsc"
+version = "0.1.0"
+edition = "2024"
+authors = ["BuzzY_ <contact@buzzybis.com>"]
+description = "Bounded sequential ring buffer with a proved FIFO and ownership model"
+license = "MIT"
+repository = "https://github.com/BuzzYbis/phy-trng"
+readme = "README.md"
+keywords = ["ringbuffer", "verification", "no-std", "fifo"]
+categories = ["data-structures", "no-std"]
+
+[dependencies]
+# Creusot will own this crate. `creusot-std` is added back with the first
+# contract: `cargo creusot` compiles every workspace member and rejects a
+# crate that depends on it without using it.
+
+
+[lints]
+workspace = true

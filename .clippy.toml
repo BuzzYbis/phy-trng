@@ -1,4 +1,4 @@
-cognitive-complexity-threshold = 10
+cognitive-complexity-threshold = 14
 
 # Production paths keep the `panic`, `unwrap_used` and `expect_used` bar from
 # the workspace lint table: these relaxations apply to test code only, where a

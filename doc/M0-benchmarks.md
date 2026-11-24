@@ -1,6 +1,6 @@
 # M0 — Benchmarks
 
-**Version 0.3 — second-review revision. Design specification; no implementation, proof, measurement or certification result is asserted.**
+**Version 0.3.1 — second-review revision with editorial corrections (ARCHITECTURE §13.2). Design specification; no implementation, proof, measurement or certification result is asserted.**
 
 **Gate:** G0 · **Paired design:** [M0-architecture.md](M0-architecture.md)
 
@@ -62,7 +62,7 @@ All prior applicable blocking results remain required. Check transitive content/
 
 ### B-VER-04 — Trusted-boundary inventory
 
-**Method:** Review semantic breadth, not just annotation count. One giant trusted function is not a small trust boundary. Record crypto and compiler artifact scope.
+**Method:** Review semantic breadth, not just annotation count. One giant trusted function is not a small trust boundary. Record crypto and compiler artifact scope. The ≤12 baseline applies to code-level trusted boundaries/entries (unsafe, #[trusted], external_body, FFI/HAL/seL4 adapters in proofs/tcb-inventory.tsv), tracked separately from narrative platform/tool/physical assumptions in proofs/tcb.md (B-ARG-08).
 
 **Artifact:** `bench/b-ver-04.json` · **Tier:** Review.
 
@@ -129,7 +129,7 @@ Planned project commands (to be implemented, not claimed to exist yet):
 ```sh
 make bench PROFILE=reference MILESTONE=M0
 make verify PROFILE=reference
-make gate G0 PROFILE=reference
+make gate GATE=G0 PROFILE=reference
 ```
 
 A gate fails on missing, failed, stale or pending applicable blocking evidence. Profile-approved not-applicable results require the registry applicability rule. The complete shared definitions are in [BENCHMARKS.md](BENCHMARKS.md).

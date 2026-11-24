@@ -29,8 +29,13 @@ categories = ["cryptography", "no-std"]
 
 [workspace]
 resolver = "3"
-members = [".", "crates/driver-api"]
-default-members = [".", "crates/driver-api"]
+members = [".", "crates/driver-api", "crates/ptrng-core", "crates/ptrng-spsc"]
+default-members = [
+    ".",
+    "crates/driver-api",
+    "crates/ptrng-core",
+    "crates/ptrng-spsc",
+]
 
 
 # ---------------------------------------------------------------------------- #
@@ -83,6 +88,12 @@ pedantic = { level = "warn", priority = 0 }
 cargo = { level = "warn", priority = 0 }
 
 # Security, complexity, and no_std invariants
+# `arithmetic_side_effects`, `indexing_slicing`, and `integer_division` are
+# intentionally disabled: in code under mandatory Creusot/Verus obligations,
+# overflow, bounds and division safety are proved. Code outside proof scope
+# (trusted HAL/MMIO, FFI and seL4 glue, host tools) is covered by neither the
+# lints nor a proof; trusted code is inventoried in `proofs/tcb.md` and
+# reviewed. See doc/REPOSITORY_STATUS.md section 4.1.
 cognitive_complexity = { level = "warn", priority = 1 }
 unwrap_used = { level = "warn", priority = 1 }
 expect_used = { level = "warn", priority = 1 }
@@ -112,10 +123,12 @@ mem_forget = { level = "warn", priority = 1 }
 # problem it hid.
 allow_attributes_without_reason = { level = "warn", priority = 1 }
 
-# No cast without a written reason. `pedantic` already denies every lossy cast
-# (`cast_possible_truncation`, `cast_sign_loss`, `cast_possible_wrap`,
-# `cast_precision_loss`, `cast_lossless`), so this adds only the provably
-# lossless ones. That is the point: it turns "this cast is fine" from a
+# No cast without a written reason. `pedantic` already flags casts that can
+# truncate, wrap, lose sign or lose precision (`cast_possible_truncation`,
+# `cast_possible_wrap`, `cast_sign_loss`, `cast_precision_loss`) and lossless
+# casts that have a `From` equivalent (`cast_lossless`). This lint catches
+# every remaining `as`, such as enum-discriminant and pointer-to-integer
+# casts. That is the point: it turns "this cast is fine" from a
 # reader's assumption into a recorded justification, the same discipline
 # `proofs/tcb.md` applies to trusted code.
 as_conversions = { level = "warn", priority = 1 }

@@ -1,6 +1,6 @@
 # M3 — Generator construction and both entropy transfers
 
-**Version 0.3 — second-review revision. Design specification; no implementation, proof, measurement or certification result is asserted.**
+**Version 0.3.1 — second-review revision with editorial corrections (ARCHITECTURE §13.2). Design specification; no implementation, proof, measurement or certification result is asserted.**
 
 **Effort:** 90 h provisional · **Productive weeks:** 33–41 · **Gate:** [G3](GATES.md#g3)
 

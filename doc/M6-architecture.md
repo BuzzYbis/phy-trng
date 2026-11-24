@@ -1,6 +1,6 @@
 # M6 — Deployment isolation and timing
 
-**Version 0.3 — second-review revision. Design specification; no implementation, proof, measurement or certification result is asserted.**
+**Version 0.3.1 — second-review revision with editorial corrections (ARCHITECTURE §13.2). Design specification; no implementation, proof, measurement or certification result is asserted.**
 
 **Effort:** 120 h provisional · **Productive weeks:** 71–82 · **Gate:** [G6](GATES.md#g6)
 
@@ -21,7 +21,7 @@ Deploy the qualified functional and local release model without replacing its co
 
 ## PD configuration
 
-Use the seven application PDs in ARCHITECTURE plus actual timer/platform support where necessary. For every capability record the holder, mapping rights, recipient, purpose and compromise consequence. `pd_release` directly reads authentic health ORA/epoch state and trusted monotone time; it does not trust a generator-relayed authorization record as issuer provenance.
+Use the seven application PDs in ARCHITECTURE plus actual timer/platform support where necessary. For every capability record the holder, mapping rights, recipient, purpose and compromise consequence. `pd_release` directly reads authentic health ORA/epoch state and trusted monotone time; it does not trust a generator-relayed authorization record as issuer provenance. This follows a staged evolution from the initial 2-PD Microkit bring-up (`sel4-camera-pd`, `sel4-entropy-pd` in [REPOSITORY_AND_PROOF_SETUP.md](REPOSITORY_AND_PROOF_SETUP.md)) to the 7-PD deployment architecture required for G6.
 
 Only release may publish the client commit descriptor/write output. Generator can write staging but not release's private commit buffer. Health exclusively writes protected snapshots before immutable handoff. The actual protocol has protected receiver ledgers and finite slot lifetimes, not shared indices treated as ownership proof.
 
@@ -31,7 +31,7 @@ The release application logic target is ≤300 SLOC, but required checking is no
 
 For enforced profiles, confine every camera DMA path/stream ID to approved regions, protect mapping tables and retain policy-update authority outside the driver. Test allowed and deliberately forbidden descriptors, attempts to broaden mappings and fault routing; verify forbidden memory unchanged.
 
-For trusted profiles, A-DMA-1 is explicit in technical assumptions/ST/guidance as appropriate, and no enforcement result is claimed. A compromised DMA-trusted driver can invalidate isolation; successful CPU mapping tests do not remove that limit.
+For trusted profiles, A-DMA-1 is explicit in technical assumptions/ST/guidance as appropriate, and no enforcement result is claimed. A compromised DMA-trusted driver can invalidate isolation; successful CPU mapping tests do not remove that limit. Raspberry Pi 4 (BCM2711) uses the A-DMA-1 trusted profile due to the absence of an ARM SMMU for Unicam DMA. [ARCHITECTURE §6.1](ARCHITECTURE.md#61-claims-under-a-dma-1) lists the isolation claims that remain, each conditional on correct camera DMA.
 
 ## Hostile transport
 

@@ -1,6 +1,6 @@
 # M7 — Environmental qualification and evidence
 
-**Version 0.3 — second-review revision. Design specification; no implementation, proof, measurement or certification result is asserted.**
+**Version 0.3.1 — second-review revision with editorial corrections (ARCHITECTURE §13.2). Design specification; no implementation, proof, measurement or certification result is asserted.**
 
 **Effort:** 120 h provisional · **Productive weeks:** 83–94 · **Gate:** [G7](GATES.md#g7)
 
@@ -20,7 +20,7 @@ Qualify the final selected hardware/software profile over its supported envelope
 
 ## Schedule from measured quantities
 
-Enumerate all 54 candidate supported cells; retain a disposition row for every one. Do not plan for 25 unspecified points. Exclude a physically impossible/unsupported cell only with a versioned rationale and narrower advertised envelope. Record equilibrated sensor parameters or the defined warming trajectory, rather than only ambient labels.
+Enumerate all 54 candidate supported cells; retain a disposition row for every one. Exclude a physically impossible/unsupported cell only with a versioned rationale and narrower advertised envelope. Record equilibrated sensor parameters or the defined warming trajectory, rather than only ambient labels.
 
 T_irn acquisition per run is 2,040,000/qualified_ptg_rate seconds. Multiply by actual cells and permitted repeats, then add physical settling, analysis, rig transitions and rework. Burn-in takes at least 500 uninterrupted operating hours; thermal cycling takes dwell plus measured settling/ramp time. Recompute the false-alarm campaign from the actual independent opportunity cadence if dependent changes invalidate it.
 
@@ -32,14 +32,14 @@ Run PTG.3 T_irn and the relevant model/assessment checks across every supported 
 
 Thermal cycling: 50 cycles, supported extremes, at least 20 min dwell or longer if the measured settling model requires it; inspect early/middle/late cycles and transitions. Credit remains justified even if measured entropy moves; a 10% drift triggers review rather than automatically proving failure or success.
 
-Burn-in: 500 h with hourly diagnostics, configuration checks and alarm records; daily T_irn. Predeclare trend/incident rules and preserve failures. Restart storm: 1,000 deployment-realistic restarts with startup, fresh seed, reset/replay behavior and no pre-eligibility output checked. Report actual confidence of the success count (~0.9970 lower bound for 1,000/1,000), not an invented 99.9% qualification.
+Burn-in: 500 h with hourly diagnostics, configuration checks and alarm records; daily T_irn. Predeclare trend/incident rules and preserve failures. Restart storm: 1,000 deployment-realistic restarts with startup, fresh seed, reset/replay behavior and no pre-eligibility output checked. Report the achieved confidence of the success count (~0.9970 lower bound for 1,000/1,000).
 
 ## Applicable evidence package
 
 | Set | Planned content |
 |---|---|
 | PTG.3 | HP.1–HP.7, all selected PTG.3 requirements, B-ARG-09 output derivation |
-| Inner PTRNG | P.2–P.7, P.9–P.15, P.18, P.20 for the non-PTG.2 variant, with P.12 adapted |
+| Inner PTRNG | P.2–P.7, P.9–P.15, P.18, P.20 for the non-PTG.2 variant, with P.1 covered under HP.1 and P.12 adapted (verify exact UPD25 itemization during M7 assembly) |
 | DRG.4 | HD.1–HD.5, D.1–D.17 as applicable, actual seeding/composition and secrecy selections |
 | Guidance | Supported envelope, installation/protection duties, API/error handling, acquisition/DMA scope, startup/refresh behavior |
 | ST | Completed FCS_RNG.1 selections/assignments and correctly categorized TOE/environment assumptions |

@@ -1,6 +1,6 @@
 # M2 — Source model and Stage 1 argument
 
-**Version 0.3 — second-review revision. Design specification; no implementation, proof, measurement or certification result is asserted.**
+**Version 0.3.1 — second-review revision with editorial corrections (ARCHITECTURE §13.2). Design specification; no implementation, proof, measurement or certification result is asserted.**
 
 **Effort:** 150 h provisional · **Productive weeks:** 18–32 · **Gate:** [G2](GATES.md#g2)
 

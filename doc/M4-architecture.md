@@ -1,6 +1,6 @@
 # M4 — Single-target vertical slice
 
-**Version 0.3 — second-review revision. Design specification; no implementation, proof, measurement or certification result is asserted.**
+**Version 0.3.1 — second-review revision with editorial corrections (ARCHITECTURE §13.2). Design specification; no implementation, proof, measurement or certification result is asserted.**
 
 **Effort:** 150 h provisional · **Productive weeks:** 42–56 · **Gate:** [G4](GATES.md#g4)
 

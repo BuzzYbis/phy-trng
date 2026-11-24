@@ -1,0 +1,13 @@
+# Declared trust markers in tracked Rust sources.
+#
+# Format, tab-separated:   count<TAB>marker<TAB>path
+# Generated shape must match `ci/check-trust.sh --print` exactly, after
+# comment and blank lines are removed. Sort order is the script's.
+#
+# Every line here needs a justification in `tcb.md`.
+#
+# Current state: no trust marker exists in any tracked Rust source, so this
+# inventory is intentionally empty. Adding `unsafe`, `#[trusted]`,
+# `external_body`, `assume!`, `admit!` or a `#[creusot::*]`/`#[verifier::*]`
+# escape hatch will fail the check until it is declared here and justified in
+# `tcb.md`.

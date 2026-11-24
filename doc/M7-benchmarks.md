@@ -1,6 +1,6 @@
 # M7 — Benchmarks
 
-**Version 0.3 — second-review revision. Design specification; no implementation, proof, measurement or certification result is asserted.**
+**Version 0.3.1 — second-review revision with editorial corrections (ARCHITECTURE §13.2). Design specification; no implementation, proof, measurement or certification result is asserted.**
 
 **Gate:** G7 · **Paired design:** [M7-architecture.md](M7-architecture.md)
 
@@ -23,7 +23,7 @@ All prior applicable blocking results remain required. Check transitive content/
 
 ### B-ROB-01 — Supported-envelope qualification
 
-**Method:** Cells defined in BENCHMARKS §2. Pruning requires a named configuration constraint and updated advertised envelope; no informal approximation to 25 cells. Include transitions/aging checks separately.
+**Method:** Cells defined in BENCHMARKS §2. Pruning requires a named configuration constraint and updated advertised envelope; no informal reduction of the envelope. Include transitions/aging checks separately.
 
 **Artifact:** `bench/b-rob-01.json` · **Tier:** Campaign.
 
@@ -66,7 +66,7 @@ Planned project commands (to be implemented, not claimed to exist yet):
 ```sh
 make bench PROFILE=reference MILESTONE=M7
 make verify PROFILE=reference
-make gate G7 PROFILE=reference
+make gate GATE=G7 PROFILE=reference
 ```
 
 A gate fails on missing, failed, stale or pending applicable blocking evidence. Profile-approved not-applicable results require the registry applicability rule. The complete shared definitions are in [BENCHMARKS.md](BENCHMARKS.md).

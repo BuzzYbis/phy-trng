@@ -1,6 +1,6 @@
 # Phy-TRNG — Benchmark Specification
 
-**Version 0.3 — second-review revision. Design specification; no implementation, proof, measurement or certification result is asserted.**
+**Version 0.3.1 — second-review revision with editorial corrections (ARCHITECTURE §13.2). Design specification; no implementation, proof, measurement or certification result is asserted.**
 
 This is the canonical benchmark registry. Gate and milestone tables reference these IDs. Numeric engineering targets are distinguished from normative claims, provisional aspirations and configuration-specific bounds. All reported results name a boundary and qualified build profile.
 
@@ -22,9 +22,9 @@ At true false-alarm probability 10^-6, observing zero in 3,000,000 trials occurs
 
 ## 2. Environmental matrix and campaign manifest
 
-Supported candidate envelope: temperature T1=5°C, T2=25°C, T3=45°C; voltage V1=nominal−5%, V2=nominal, V3=nominal+5%; lamp L1=warming, L2=steady; ambient A1=dark room, A2=office, A3=direct sunlight on enclosure. This is **54 cells**. Sensor temperature and mean/clipping/read-noise parameters are logged separately from ambient labels. Warming has an explicitly defined time trajectory, not an assumed stationary equilibrium.
+Supported candidate envelope: temperature T1=5°C, T2=25°C, T3=45°C; voltage V1=nominal−5%, V2=nominal, V3=nominal+5%; lamp L1=warming, L2=steady; ambient A1=dark room, A2=office, A3=direct sunlight on enclosure. This is **54 cells**. Sensor temperature and mean/clipping/read-noise parameters are logged separately from ambient labels. Each ambient label is defined by a measured illuminance range at the enclosure, fixed in the campaign manifest before acquisition; A3 is a measured level, not a weather condition. Warming has an explicitly defined time trajectory, not an assumed stationary equilibrium.
 
-Reference cell: T2-V2-L2-A2. Every cell is supported by default for planning, pending M0/G2 qualification. If a physical combination cannot exist or cannot support the model, record a justified exclusion and narrow the advertised envelope before accepting the campaign. No silent reduction to 'about 25 points'.
+Reference cell: T2-V2-L2-A2. Every cell is supported by default for planning, pending M0/G2 qualification. If a physical combination cannot exist or cannot support the model, record a justified exclusion and narrow the advertised envelope before accepting the campaign. The envelope is never reduced informally.
 
 | Cell IDs (all three ambient conditions per row) | Temperature | Voltage | Lamp |
 |---|---|---|---|
@@ -140,6 +140,8 @@ All items require their stated artifacts and machine-readable result. Review ite
 **Method:** Check units and the model-derived bound for the actual accepted-block regime. Apply the margin after successful 90B assessment. Record model/estimator uncertainty and configuration. This project margin is not a NIST requirement or a repair for a false physical model.
 
 **Artifact:** `bench/b-ent-04.json`.
+
+> *Note:* `B-ENT-05` is intentionally retired/reserved in v0.3 and must not be reused.
 
 ### B-ENT-06 — Stage 1 implementation regression
 
@@ -317,7 +319,7 @@ All items require their stated artifacts and machine-readable result. Review ite
 
 **Acceptance:** Independent cutoff calculation matches the selected 90B method; target failures detected; false-alarm **upper confidence bound**, not observed proportion, ≤ configured alpha=2^-20.
 
-**Method:** Define sample alphabet, entropy estimate, cutoff convention, window and per-opportunity event unit for each test. Use the exact standard algorithms including startup/continuous behavior. Publish counts, bounds and dependence assumptions. Very low false-alarm rates are allowed. RCT/APT complement the source-model online tests; they do not replace them.
+**Method:** Define sample alphabet, entropy estimate, cutoff convention, window and per-opportunity event unit for each test. Use the exact standard algorithms including startup/continuous behavior. Publish counts, bounds and dependence assumptions. Very low false-alarm rates are allowed. RCT/APT complement the source-model online tests; they do not replace them. For alpha=2^-20 (~9.537×10^-7), a one-sided 95% upper bound with zero alarms requires at least n≥3,141,252 independent opportunities (more than B-HLT-04's 3,000,000 default for 10^-6); predeclare n and any allowed-alarm plan accordingly.
 
 **Artifact:** `bench/b-hlt-06.json`.
 
@@ -477,7 +479,7 @@ All items require their stated artifacts and machine-readable result. Review ite
 
 **Acceptance:** All static allocations and configured buffers fit the frozen per-profile memory budget.
 
-**Method:** Report state, stack, frame/DMA, snapshots, raw/intermediate rings, seed reservoir, staging, commit buffers and replay ledgers separately. The legacy ≤8 KiB non-buffer target is advisory; excluded buffers remain in the system total.
+**Method:** Report state, stack, frame/DMA, snapshots, raw/intermediate rings, seed reservoir, staging, commit buffers and replay ledgers separately. A ≤8 KiB non-buffer target is advisory; excluded buffers remain in the system total.
 
 **Artifact:** `bench/b-foot-02.json`.
 
@@ -567,7 +569,7 @@ All items require their stated artifacts and machine-readable result. Review ite
 
 **Acceptance:** Every trust item has spec, scope, owner, rationale and control; baseline ≤12 review entries or explicitly revised design inventory.
 
-**Method:** Review semantic breadth, not just annotation count. One giant trusted function is not a small trust boundary. Record crypto and compiler artifact scope.
+**Method:** Review semantic breadth, not just annotation count. One giant trusted function is not a small trust boundary. Record crypto and compiler artifact scope. The ≤12 baseline applies to code-level trusted boundaries/entries (unsafe, #[trusted], external_body, FFI/HAL/seL4 adapters in proofs/tcb-inventory.tsv), tracked separately from narrative platform/tool/physical assumptions in proofs/tcb.md (B-ARG-08).
 
 **Artifact:** `bench/b-ver-04.json`.
 
@@ -647,7 +649,7 @@ All items require their stated artifacts and machine-readable result. Review ite
 
 **Acceptance:** PTG.3 T_irn and relevant entropy/model checks pass for all 54 supported cells, unless an exclusion was explicitly approved before campaign.
 
-**Method:** Cells defined in BENCHMARKS §2. Pruning requires a named configuration constraint and updated advertised envelope; no informal approximation to 25 cells. Include transitions/aging checks separately.
+**Method:** Cells defined in BENCHMARKS §2. Pruning requires a named configuration constraint and updated advertised envelope; no informal reduction of the envelope. Include transitions/aging checks separately.
 
 **Artifact:** `bench/b-rob-01.json`.
 
@@ -667,7 +669,7 @@ All items require their stated artifacts and machine-readable result. Review ite
 
 **Acceptance:** Each trial yields justified operation or a clean refusal; no unjustified output.
 
-**Method:** At least 50 cold starts with conditions/observed outcomes reported (no unsupported 99.9% claim). Before real health at M5, acquisition/model verdicts are provisional. Out-of-range conditions are not required to emit T_irn data.
+**Method:** At least 50 cold starts with conditions/observed outcomes reported; claim only the confidence bound the trial count supports. Before real health at M5, acquisition/model verdicts are provisional. Out-of-range conditions are not required to emit T_irn data.
 
 **Artifact:** `bench/b-rob-03.json`.
 
@@ -907,7 +909,7 @@ Separate buffered requests (B-PERF-02), cached qualified refresh (07), uncached/
 
 For N independent opportunities at duration/stride tau, campaign wall clock is at least `N*tau`, plus settling/restarts and unavailable rig time. Three million windows take 3.47 days at 100 ms, 34.72 days at 1 s and 347.22 days at 10 s. Correlated overlapping windows cannot be counted as independent to shorten the campaign. The G5 plan must fit real rig capacity or revise the detector/claim before acceptance.
 
-One T_irn acquisition takes `2,040,000 / qualified_ptg_rate` seconds. Calculate the 54-cell schedule including the permitted repeat, physical settling, analysis and failures. Use measured qualified rates, not the illustrative 19.44 kbit/s arithmetic.
+One T_irn acquisition takes `2,040,000 / qualified_ptg_rate` seconds. Calculate the 54-cell schedule including the permitted repeat, physical settling, analysis and failures. Use measured qualified rates, not the illustrative arithmetic of ARCHITECTURE §4.2.
 
 ## 7. CI, staleness and result schema
 

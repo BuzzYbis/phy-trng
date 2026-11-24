@@ -1,10 +1,10 @@
 # Phy-TRNG — Gates
 
-**Version 0.3 — second-review revision. Design specification; no implementation, proof, measurement or certification result is asserted.**
+**Version 0.3.1 — second-review revision with editorial corrections (ARCHITECTURE §13.2). Design specification; no implementation, proof, measurement or certification result is asserted.**
 
 ## Gate semantics
 
-`make gate G<n> PROFILE=<qualified-profile>` consumes the canonical benchmark registry and the result/dependency manifests. Every newly active and prior applicable BLOCKING item must pass. ADVISORY findings carry a written owner, consequence and disposition. No confidence reduction or proof admission is an advisory waiver.
+`make gate GATE=G<n> PROFILE=<qualified-profile>` (planned, not implemented yet; `make gates` is different: it runs the CI checks in `ci/`, which produce some of the evidence these milestone gates consume) consumes the canonical benchmark registry and the result/dependency manifests. Every newly active and prior applicable BLOCKING item must pass. ADVISORY findings carry a written owner, consequence and disposition. No confidence reduction or proof admission is an advisory waiver.
 
 1. Missing, failed, stale or pending mandatory results fail the gate.
 2. A profile-authorized not-applicable result requires the registry's exact applicability rule; no Formosa requirement applies to a justified soft-only/SHA-256 profile, but independent oracle/vector evidence still applies.
@@ -15,7 +15,7 @@
 7. Prior results may be reused only under dependency/content validity. Rebuild final code and replay final analysis; distinguish archived evidence from new physical acquisition.
 8. G0–G4 establish prototypes and arguments; they do not authorize production entropy release before G5/G6 qualifications.
 
-The benchmark acceptance text below is generated from BENCHMARKS' registry. Milestone-specific scope is stated in the corresponding pair of documents. A configured engineering target is frozen only by the named gate; changing it later is a versioned design change that reopens dependent results.
+The benchmark acceptance text below is copied verbatim from the BENCHMARKS registry, as are the milestone benchmark files and the explorer's data. No generator exists yet: edit the registry first, then update every copy identically. Milestone-specific scope is stated in the corresponding pair of documents. A configured engineering target is frozen only by the named gate; changing it later is a versioned design change that reopens dependent results.
 
 
 <a id="g0"></a>

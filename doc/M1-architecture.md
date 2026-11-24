@@ -1,6 +1,6 @@
 # M1 — Acquisition and capture
 
-**Version 0.3 — second-review revision. Design specification; no implementation, proof, measurement or certification result is asserted.**
+**Version 0.3.1 — second-review revision with editorial corrections (ARCHITECTURE §13.2). Design specification; no implementation, proof, measurement or certification result is asserted.**
 
 **Effort:** 90 h provisional · **Productive weeks:** 9–17 · **Gate:** [G1](GATES.md#g1)
 
@@ -44,7 +44,7 @@ Document each detected fault and non-detection case. Physical provenance is cove
 
 ## Capture contract
 
-At least 20 h across four identified candidate supported cells. At 1.944 Mbit/s this is about 17.5 GB decimal for packed raw bits; full 10-bit frames are much larger, so retain representative full-frame windows deliberately. Every session stores source/unit identity, live register dump, tool/build version, temperature, voltage, illumination/lamp trajectory, frame/sample IDs and timing.
+At least 20 h across four identified candidate supported cells. At the IMX296 reference rate of 2.97 Mbit/s (1456×1088 RAW10 at the 60 fps target, 1-in-32 subsampling, one bit per pixel) this is about 26.7 GB decimal of packed raw bits. Full RAW10 frames are much larger, so retain representative full-frame windows deliberately, and record the Bayer CFA channel layout for M2. Every session stores source/unit identity, live register dump, tool/build version, temperature, voltage, illumination/lamp trajectory, frame/sample IDs and timing.
 
 Archive captures and sidecars with immutable hashes and a manifest. Retain failures as labelled failures. Qualification sequences must be contiguous under the defined sampling rule; do not stitch separated captures into a fake uninterrupted sequence.
 

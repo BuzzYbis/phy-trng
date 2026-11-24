@@ -1,0 +1,159 @@
+# Toolchain and artifact pins.
+#
+# Rules:
+#   * No floating `latest`, branch-only or wildcard version may appear in a
+#     field used by release CI.
+#   * A version is populated only by a successful compatibility check. An
+#     unpopulated field is written as the empty string and is validated as
+#     "not yet established", never guessed.
+#   * `ci/bootstrap-proofs.sh` reads this file, reports the tool identities it
+#     actually finds and fails on a mismatch.
+#
+# Recorded on 2026-09-17 from the development host below. These are
+# *observed* identities of a working Creusot baseline, not an upstream-tested
+# version matrix.
+
+[meta]
+revision = 1
+recorded = "2026-09-17"
+# The status of each section: "observed" means the values were read from a
+# working installation; "unpopulated" means no compatibility check has run.
+creusot_status = "observed"
+verus_status = "unpopulated"
+runtime_status = "unpopulated"
+
+[host]
+# Reference CI environment is Linux; this is the developer machine that
+# produced the observed Creusot values.
+developer = "Darwin 25.6.0 arm64"
+ci_reference = ""            # Linux CI image identity, once one exists.
+container_digest = ""
+
+# ---------------------------------------------------------------------------
+# Creusot — entropy-processing library (`phy-trng`)
+# ---------------------------------------------------------------------------
+
+[creusot]
+# `cargo creusot version` reports 0.14.0-dev; the checkout is 48 commits past
+# the v0.13.0 tag, so the commit is the pin and the version string is not.
+release = ""                 # No tagged release in use.
+commit = "c2dea58cfa425ad22c7382872720216c6093ae61"
+describe = "v0.13.0-48-gc2dea58cf"
+cargo_creusot_version = "0.14.0-dev"
+rust_toolchain = "nightly-2026-08-03"
+# Installed from a local checkout rather than a release archive, so there is
+# no archive checksum to record; the commit is the identity.
+install_method = "source checkout"
+checkout_path = "/Users/ugo/Info_projet_perso/creusot"
+
+[creusot.contract_library]
+# `creusot-std` is declared as a crates.io dependency at 0.14.0-dev but is
+# redirected to the Creusot checkout by a `[patch.crates-io]` entry. That
+# patch currently lives in the developer's `~/.cargo/config.toml`, so it is
+# recorded here rather than silently inherited. It is deliberately not added
+# to a repository `.cargo/config.toml` because the path is machine-specific.
+name = "creusot-std"
+version = "0.14.0-dev"
+patch_required = true
+patch_table = "patch.crates-io"
+patch_target = "<creusot checkout>/creusot-std"
+
+[creusot.why3]
+why3 = "1.8.2+git"
+why3find = "1.3.0+dev"
+# Cache format recorded in `.why3find/version`.
+cache_format = "v4@why3.1.8.2+git"
+
+[creusot.provers]
+# Selected in `why3find.json`, in that order.
+alt_ergo = "2.6.2"
+z3 = "4.15.3"
+cvc4 = "1.8"
+cvc5 = "1.3.1"
+# A different Z3 may sit earlier on PATH (5.1.0 on the recording host). The
+# solver identity that matters is the one `cargo creusot version` reports,
+# because that is the binary Why3 invokes.
+path_z3_observed = "5.1.0"
+
+# ---------------------------------------------------------------------------
+# Verus — camera-driver protocol and buffer logic
+# ---------------------------------------------------------------------------
+
+[verus]
+# Nothing is installed. `ci/prove-driver.sh` refuses to run until these are
+# populated by a successful check, and reports an unconfigured gate rather
+# than a pass.
+release = ""                 # Pinned weekly release tag.
+commit = ""
+archive_url = ""
+archive_sha256 = ""
+rust_toolchain = ""          # The toolchain the release requests.
+vstd_version = ""            # Must match the distribution.
+z3_version = ""              # Must match the distribution.
+cargo_verus_available = ""   # "true"/"false", from `cargo verus --help`.
+
+# ---------------------------------------------------------------------------
+# Runtime — target build and deployment
+# ---------------------------------------------------------------------------
+
+[runtime]
+rust_toolchain = ""
+target_triple = ""           # AArch64 seL4 target from the pinned example.
+sel4_rust_bindings_rev = ""
+microkit_sdk_version = ""
+microkit_sdk_sha256 = ""
+microkit_board_config = ""   # Pi 4 configuration matching installed RAM.
+kernel_config = ""
+linker = ""
+
+# ---------------------------------------------------------------------------
+# Host build — ordinary executable builds and tests
+# ---------------------------------------------------------------------------
+
+[host_build]
+rustc = "1.98.0 (88d9e12ae 2026-08-18)"
+cargo = "1.98.0 (797e8a9bc 2026-08-05)"
+# `cargo fmt` is invoked through the nightly toolchain by the makefile.
+fmt_toolchain = "nightly"
+
+# ---------------------------------------------------------------------------
+# Reproducibility
+# ---------------------------------------------------------------------------
+
+[reproducibility]
+cargo_lock_sha256 = "1a1e30de3ed39e459e5db20f16ba6ef69f350f9c3460784c2de5bd1eb5295853"
+why3find_json_sha256 = "80e22e33d612aa049f17b9d72e641873a6887e31371e3556d3f5dfc9e3c98c2b"
+
+# Open items that block a clean-checkout replay. These are recorded defects,
+# not accepted properties.
+[[reproducibility.open_items]]
+id = "REPRO-1"
+summary = "Checked-in Coma carries developer-absolute spans"
+detail = """
+`verif/phy_trng_rlib/zero_slice.coma` is tracked and contains absolute paths
+under the recording host's home directory, including paths into the Creusot
+checkout. Creusot's `--span-mode relative` exists for generated code that is
+checked into version control. Switching regenerates the baseline and may
+invalidate `verif/phy_trng_rlib/zero_slice/proof.json`, so it is deferred
+until the regeneration policy for replay files is decided.
+"""
+
+[[reproducibility.open_items]]
+id = "REPRO-2"
+summary = "Creusot patch lives outside the repository"
+detail = """
+The `[patch.crates-io]` redirect for `creusot-std` is in the developer's
+`~/.cargo/config.toml`. A clean checkout on another machine does not inherit
+it. `ci/bootstrap-proofs.sh` checks that the patch is present and reports its
+target, but the repository cannot supply it portably until the pinned Creusot
+is installed at an agreed path or published.
+"""
+
+[[reproducibility.open_items]]
+id = "REPRO-3"
+summary = "No Linux CI reference environment"
+detail = """
+`host.ci_reference` and `host.container_digest` are unpopulated. The observed
+Creusot values come from macOS on arm64. Release CI must record its own
+identities before those values are treated as pins.
+"""

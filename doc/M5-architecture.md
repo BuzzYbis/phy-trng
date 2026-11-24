@@ -1,6 +1,6 @@
 # M5 — Health, authorization and release
 
-**Version 0.3 — second-review revision. Design specification; no implementation, proof, measurement or certification result is asserted.**
+**Version 0.3.1 — second-review revision with editorial corrections (ARCHITECTURE §13.2). Design specification; no implementation, proof, measurement or certification result is asserted.**
 
 **Effort:** 140 h provisional · **Productive weeks:** 57–70 · **Gate:** [G5](GATES.md#g5)
 
@@ -53,11 +53,11 @@ Alarm handling invalidates outstanding context, stops new permits and schedules 
 
 ## Statistical campaign plan
 
-Defaults: 299 zero-miss independent trials for ≥0.99 per-class detection; 2,995 for ≥0.999 startup; three million zero-alarm independent opportunities for ≤10^-6. Use exact one-sided bounds, predeclared counts/stopping rules and explicit confidence scope. B-HLT-06 requires the upper bound ≤alpha, not merely k/n≤alpha.
+Defaults: 299 zero-miss independent trials for ≥0.99 per-class detection; 2,995 for ≥0.999 startup; three million zero-alarm independent opportunities for ≤10^-6. Use exact one-sided bounds, predeclared counts/stopping rules and explicit confidence scope. B-HLT-06 requires the upper bound ≤alpha, not merely k/n≤alpha (at least 3,141,252 zero-alarm independent opportunities for alpha=2^-20).
 
 Choose separate worst entropy, false-alarm and detection-delay scenarios. Treat overlapping windows/continuous state carefully; resetting the rig does not automatically preserve the deployed null distribution. Retain failures and all trials. No weaker achieved bound silently passes G5.
 
-Compute wall clock from actual opportunity cadence and rig throughput before starting. At one second/window, three million windows take 34.72 days; at ten seconds, 347.22 days. Replace the old fixed week-60 start assumption with a measured campaign schedule. Independent review/rig availability are explicit critical-path dependencies.
+Compute wall clock from actual opportunity cadence and rig throughput before starting. At one second/window, three million windows take 34.72 days; at ten seconds, 347.22 days. Fix the campaign start from this measured schedule. Independent review/rig availability are explicit critical-path dependencies.
 
 ## Exit
 

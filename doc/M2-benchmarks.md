@@ -1,6 +1,6 @@
 # M2 — Benchmarks
 
-**Version 0.3 — second-review revision. Design specification; no implementation, proof, measurement or certification result is asserted.**
+**Version 0.3.1 — second-review revision with editorial corrections (ARCHITECTURE §13.2). Design specification; no implementation, proof, measurement or certification result is asserted.**
 
 **Gate:** G2 · **Paired design:** [M2-architecture.md](M2-architecture.md)
 
@@ -92,7 +92,7 @@ All prior applicable blocking results remain required. Check transitive content/
 
 ### B-ROB-03 — Cold/out-of-range behavior
 
-**Method:** At least 50 cold starts with conditions/observed outcomes reported (no unsupported 99.9% claim). Before real health at M5, acquisition/model verdicts are provisional. Out-of-range conditions are not required to emit T_irn data.
+**Method:** At least 50 cold starts with conditions/observed outcomes reported; claim only the confidence bound the trial count supports. Before real health at M5, acquisition/model verdicts are provisional. Out-of-range conditions are not required to emit T_irn data.
 
 **Artifact:** `bench/b-rob-03.json` · **Tier:** Campaign.
 
@@ -111,7 +111,7 @@ Planned project commands (to be implemented, not claimed to exist yet):
 ```sh
 make bench PROFILE=reference MILESTONE=M2
 make verify PROFILE=reference
-make gate G2 PROFILE=reference
+make gate GATE=G2 PROFILE=reference
 ```
 
 A gate fails on missing, failed, stale or pending applicable blocking evidence. Profile-approved not-applicable results require the registry applicability rule. The complete shared definitions are in [BENCHMARKS.md](BENCHMARKS.md).

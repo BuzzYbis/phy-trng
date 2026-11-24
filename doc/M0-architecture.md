@@ -1,6 +1,6 @@
 # M0 — Feasibility and assurance profiles
 
-**Version 0.3 — second-review revision. Design specification; no implementation, proof, measurement or certification result is asserted.**
+**Version 0.3.1 — second-review revision with editorial corrections (ARCHITECTURE §13.2). Design specification; no implementation, proof, measurement or certification result is asserted.**
 
 **Effort:** 80 h provisional · **Productive weeks:** 1–8 · **Gate:** [G0](GATES.md#g0)
 
@@ -27,7 +27,7 @@ Verdicts: confirmed; unacceptable and an alternative chosen; or unresolved. Orde
 
 ### P2 — DMA and temporal enforcement
 
-Identify every camera DMA path and stream ID, memory aperture, SMMU ownership and configuration authority. Attempt a valid and deliberately forbidden DMA transaction. A driver that can broaden its own mappings is not confined against compromise. If enforcement is unavailable, record A-DMA-1 and its effect on the claim.
+Identify every camera DMA path and stream ID, memory aperture, SMMU ownership and configuration authority. Attempt a valid and deliberately forbidden DMA transaction. A driver that can broaden its own mappings is not confined against compromise. If enforcement is unavailable, record A-DMA-1 and its effect on the claim. On Raspberry Pi 4 (BCM2711), Unicam CSI-2 DMA lacks an ARM SMMU, so the RPi4 profile records A-DMA-1 and focuses P2 on confirming that boundary plus monotone time, timer interrupts, watchdog/fault routing, and scheduler isolation.
 
 Prototype reliable monotone time, timer interrupts, watchdog/fault routing and scheduler isolation. The release protocol will rely on these; no promise of instantaneous revocation follows from seL4. Record whether bounded commit and timely revocation are implementable on the chosen target.
 
@@ -37,7 +37,7 @@ For each candidate primitive/target, record implementation, upstream commit, com
 
 ### P4 — Creusot expressiveness and unsafe boundary
 
-Using the pinned Rust/Creusot toolchain and its Why3/solver pipeline, specify a bounded const-generic bulk operation and a consumer with arbitrary shared indices. Archive tool versions, specification dependencies and a reproducible invocation. Demonstrate checked local index snapshots and a sequential logical model. State which memory-ordering/FFI primitives remain assumptions. Produce at least one discharged toy obligation with cold/warm replay timings. A fallback API must have a working prototype; a handwritten signature alone is insufficient proof of feasibility.
+Using the pinned Rust/Creusot toolchain and its Why3/solver pipeline, specify a bounded const-generic bulk operation and a consumer with arbitrary shared indices. Archive tool versions, specification dependencies and a reproducible invocation. Demonstrate checked local index snapshots and a sequential logical model. State which memory-ordering/FFI primitives remain assumptions. Produce at least one discharged toy obligation with cold/warm replay timings. A fallback API must have a working prototype; a handwritten signature alone is insufficient proof of feasibility. Run the companion Verus + Microkit compatibility experiment ([REPOSITORY_AND_PROOF_SETUP.md §6.3](REPOSITORY_AND_PROOF_SETUP.md#63-mandatory-compatibility-experiment)) and fold Verus driver-proof hours into the G0 reforecast.
 
 ### P5 — physical acquisition trust
 
@@ -45,7 +45,7 @@ Assess whether a protected sensor-side freshness mechanism exists. Record the pa
 
 ## Repository and artifact contracts
 
-Create only the scaffolding needed for probes: workspace profiles, build matrix, an evidence attribute retaining the annotated item, matrix extractor, benchmark JSON schema, dependency manifest, ADR directory and STATE.md. The evidence macro is semantically transparent; it must not delete the annotated Rust item.
+Create only the scaffolding needed for probes: workspace profiles, build matrix, an evidence mapping mechanism (either tracked inventory files such as `proofs/*/coverage.md` and `goal-inventory.txt`, or a semantically transparent attribute macro if justified without adding verifier friction; if a macro is used, it must retain the annotated Rust item unchanged), matrix extractor, benchmark JSON schema, dependency manifest, ADR directory and STATE.md.
 
 Profile fields: target/board, supported scope (compile-only or qualified), construction candidate, primitive/backend applicability, oracle, DMA mode, clock/fault mechanism, active evidence and assumptions. Keep scripts/tools separate from no_std runtime.
 

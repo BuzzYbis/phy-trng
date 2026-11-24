@@ -1,6 +1,6 @@
 # M4 — Benchmarks
 
-**Version 0.3 — second-review revision. Design specification; no implementation, proof, measurement or certification result is asserted.**
+**Version 0.3.1 — second-review revision with editorial corrections (ARCHITECTURE §13.2). Design specification; no implementation, proof, measurement or certification result is asserted.**
 
 **Gate:** G4 · **Paired design:** [M4-architecture.md](M4-architecture.md)
 
@@ -139,7 +139,7 @@ All prior applicable blocking results remain required. Check transitive content/
 
 ### B-FOOT-02 — RAM and buffers
 
-**Method:** Report state, stack, frame/DMA, snapshots, raw/intermediate rings, seed reservoir, staging, commit buffers and replay ledgers separately. The legacy ≤8 KiB non-buffer target is advisory; excluded buffers remain in the system total.
+**Method:** Report state, stack, frame/DMA, snapshots, raw/intermediate rings, seed reservoir, staging, commit buffers and replay ledgers separately. A ≤8 KiB non-buffer target is advisory; excluded buffers remain in the system total.
 
 **Artifact:** `bench/b-foot-02.json` · **Tier:** Commit.
 
@@ -246,7 +246,7 @@ Planned project commands (to be implemented, not claimed to exist yet):
 ```sh
 make bench PROFILE=reference MILESTONE=M4
 make verify PROFILE=reference
-make gate G4 PROFILE=reference
+make gate GATE=G4 PROFILE=reference
 ```
 
 A gate fails on missing, failed, stale or pending applicable blocking evidence. Profile-approved not-applicable results require the registry applicability rule. The complete shared definitions are in [BENCHMARKS.md](BENCHMARKS.md).

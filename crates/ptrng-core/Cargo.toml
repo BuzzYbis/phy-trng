@@ -1,0 +1,27 @@
+# ---------------------------------------------------------------------------- #
+#  Package Configuration                                                     - #
+# ---------------------------------------------------------------------------- #
+#
+# Errors, tagged entropy amounts and identity counters shared by the entropy
+# pipeline. Creusot owns this package: see `proofs/creusot/coverage.md`.
+
+[package]
+name = "ptrng-core"
+version = "0.1.0"
+edition = "2024"
+authors = ["BuzzY_ <contact@buzzybis.com>"]
+description = "Errors, tagged entropy amounts and identity counters for the PTRNG pipeline"
+license = "MIT"
+repository = "https://github.com/BuzzYbis/phy-trng"
+readme = "README.md"
+keywords = ["cryptography", "verification", "trng", "no-std"]
+categories = ["cryptography", "no-std"]
+
+[dependencies]
+# Creusot will own this crate. `creusot-std` is added back with the first
+# contract: `cargo creusot` compiles every workspace member and rejects a
+# crate that depends on it without using it.
+
+
+[lints]
+workspace = true
