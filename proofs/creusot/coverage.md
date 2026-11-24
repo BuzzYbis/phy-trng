@@ -1,15 +1,15 @@
 # Creusot proof coverage
 
-Status: live inventory. Recorded 2026-09-19 against the pins in
+Status: live inventory. Recorded 2026-11-24 against the pins in
 [`tools/toolchains.toml`](../../tools/toolchains.toml).
 
 | Package | Goals | State |
 | --- | ---: | --- |
 | `phy-trng` | 1 | Proved |
 | `ptrng-core` | 0 | Scaffolding, no contracts yet |
-| `ptrng-spsc` | 0 | Scaffolding, no contracts yet |
+| `ptrng-spsc` | 23 | Proved (`23` `.coma` files) |
 | `driver-api` | — | Not Creusot-owned; interface review |
-| **Total** | **1** | Discharged |
+| **Total** | **24** | Discharged |
 
 The exact goal set is [`goal-inventory.txt`](goal-inventory.txt), which
 `ci/prove-core.sh` diffs against what the translation actually produces. An
@@ -34,26 +34,35 @@ Generated output goes to `verif/`, the tool's normal path.
 | --- | --- | --- |
 | `zero_slice` | Precondition, length preservation, all elements zero, loop invariants, termination, panic freedom | Proved |
 
+## `ptrng-spsc`
+
+| Item / Function | Obligations | Result |
+| --- | --- | --- |
+| `SpscError` (`Clone`, `Debug`, `Display`, `PartialEq`, `Eq`, `Error`) | Derived traits (`6` `.coma` files incl. `Display::fmt` via `write_str`) | Proved |
+| `RingBuffer` (`Debug`, `physical_index`) | Branch-wrapped slot index (`0 <= result < N`), termination, panic freedom | Proved |
+| `new`, `new_with` | `N > 0` precondition, empty `Seq` view, termination (`new_with`), panic freedom | Proved |
+| `capacity`, `len`, `free`, `is_empty`, `is_full`, `peek` | Exact capacity/length/empty/full/front-element view specs, termination, panic freedom | Proved |
+| `push_into_available`, `try_push` | No unread overwrite on `SpscError::Full`, FIFO `push_back`, termination, panic freedom | Proved |
+| `pop_non_empty`, `pop` | Front element read, `subsequence(1, len)` FIFO shift, slot scrub with `fill`, termination, panic freedom | Proved |
+| `push_slice`, `pop_slice` | Returned-count bounds, FIFO `concat`/`subsequence`, untouched `dst[count..]` tail, loop invariants/variants, termination, panic freedom | Proved |
+| `clear` | Empty `Seq` view, full backing-array overwrite with `fill`, loop invariant/variant, termination, panic freedom | Proved |
+
 ## Packages with no coverage yet
 
-`ptrng-core` and `ptrng-spsc` exist as scaffolding: a manifest, scope rules
-and a crate-level doc comment. They carry no contracts, are absent from
-`PACKAGES` in `ci/prove-core.sh`, and have no `creusot-std` dependency.
+`ptrng-core` exists as scaffolding: a manifest, scope rules and a crate-level
+doc comment. It carries no contracts, is absent from `PACKAGES` in
+`ci/prove-core.sh`, and has no `creusot-std` dependency.
 
-When the first contract is written in either crate, three things change in
-the same commit:
+When the first contract is written in `ptrng-core`, three things change in the
+same commit:
 
-1. `creusot-std` goes back into that crate's `Cargo.toml`.
-2. The package is added to `PACKAGES` in `ci/prove-core.sh`.
+1. `creusot-std` goes back into `crates/ptrng-core/Cargo.toml`.
+2. `ptrng-core` is added to `PACKAGES` in `ci/prove-core.sh` (and `CORE_PKGS` in `makefile`).
 3. `ci/prove-core.sh --update-inventory` regenerates the goal set, and this
    file gains the matching per-function entries.
 
-The obligation lists they must eventually satisfy are in
-[`doc/M4-architecture.md`](../../doc/M4-architecture.md): "Core contracts"
-for `ptrng-core`, and "Sequential buffers and extraction" for `ptrng-spsc`
-(length and capacity, push/pop count bounds, FIFO, initialized reads, no
-unread overwrite, empty/full distinction, peek lifetime, panic freedom,
-termination).
+The obligation list `ptrng-core` must eventually satisfy is in
+[`doc/M4-architecture.md`](../../doc/M4-architecture.md) ("Core contracts").
 
 ## Design finding: modulo blocks the non-aliasing proof
 
@@ -103,10 +112,12 @@ Constraints on API shape, established against the pinned Creusot:
 ## Replay files
 
 `verif/**/*.coma` and their `proof.json` files are tracked, as is the
-`.why3find/` prover cache. See `REPRO-1` in `tools/toolchains.toml`: the
-tracked Coma carries developer-absolute spans, so it is not stable across
-checkout paths. That is a recorded reproducibility defect, not an accepted
-property, and it bears on **B-EVD-03**.
+`.why3find/` prover cache. `ci/prove-core.sh` and `makefile` pass
+`--span-mode relative`, eliminating developer-absolute `/Users/...` spans from
+the tracked Coma. See `REPRO-1` in `tools/toolchains.toml`: `REPRO-1` is
+partially mitigated, though `creusot-std` spans still encode the relative
+sibling checkout path (`../../creusot/creusot-std/...`, tied to `REPRO-2`),
+which bears on **B-EVD-03**.
 
 ## Trusted boundary
 

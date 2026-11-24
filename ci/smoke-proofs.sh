@@ -46,6 +46,8 @@ creusot_smoke() {
     say "Creusot smoke: creating a scratch package outside the workspace"
     ( cd "$scratch" && cargo creusot new creusot-smoke >/dev/null )
     local project="$scratch/creusot-smoke"
+    # Use the repository's pinned prover config rather than the host-global default.
+    cp "$REPO_ROOT/why3find.json" "$project/why3find.json"
     [[ -f "$project/src/lib.rs" ]] || die "cargo creusot new produced no library"
     info "scratch package: $project"
 

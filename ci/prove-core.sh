@@ -42,10 +42,10 @@ cd "$REPO_ROOT"
 # Selection is explicit: `default-members` is a build-target convenience, not
 # a verifier firewall.
 #
-# `ptrng-core` and `ptrng-spsc` are scaffolding with no contracts yet. Add
-# each here when it gets its first contract, together with its `creusot-std`
-# dependency, and re-run with --update-inventory.
-readonly PACKAGES=(phy-trng)
+# `ptrng-core` is scaffolding with no contracts yet. Add it here when it
+# gets its first contract, together with its `creusot-std` dependency, and
+# re-run with --update-inventory.
+readonly PACKAGES=(phy-trng ptrng-spsc)
 readonly INVENTORY="$REPO_ROOT/proofs/creusot/goal-inventory.txt"
 
 out="$(log_dir prove-core)"
@@ -69,7 +69,7 @@ baseline="$(find verif -name '*.coma' -exec shasum -a 256 {} + 2>/dev/null \
 say "Translating (stage 1 of 2 -- not a proof result)"
 for package in "${PACKAGES[@]}"; do
     set +e
-    cargo creusot --only=coma -- -p "$package" --lib 2>&1 | tee -a "$log"
+    cargo creusot --span-mode relative --only=coma -- -p "$package" --lib 2>&1 | tee -a "$log"
     status=${PIPESTATUS[0]}
     set -e
     (( status == 0 )) || die "translation of $package exited $status; see $log"
@@ -123,8 +123,8 @@ current="$(find verif -name '*.coma' -exec shasum -a 256 {} + 2>/dev/null \
     | sort || true)"
 if [[ -n "$baseline" && "$baseline" != "$current" ]]; then
     warn "the regenerated Coma differs from the tracked baseline."
-    warn "See REPRO-1 in tools/toolchains.toml: the tracked Coma carries"
-    warn "absolute spans, so it is not stable across checkout paths."
+    warn "See REPRO-1 in tools/toolchains.toml: review the Coma diff before"
+    warn "updating the tracked replay baseline."
 fi
 
 write_provenance "$out/provenance.toml" prove-core

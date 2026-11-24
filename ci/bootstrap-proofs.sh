@@ -63,7 +63,7 @@ else
     expect_pin creusot.why3.why3find \
         "$(printf '%s\n' "$versions" | awk '/^why3find /{sub(/^v/,"",$2); print $2}')" \
         "why3find"
-    for prover in alt-ergo z3 cvc4 cvc5; do
+    for prover in alt-ergo z3 cvc5; do
         key="creusot.provers.${prover//-/_}"
         expect_pin "$key" \
             "$(printf '%s\n' "$versions" | awk -v p="$prover" '$1==p{print $2}')" \

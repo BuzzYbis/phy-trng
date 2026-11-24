@@ -1,20 +1,20 @@
-(* #"/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 28 0 28 31 *)
+(* #"src/lib.rs" 30 0 30 31 *)
 
-let%span slib = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 29 14 29 21
-let%span slib'0 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 30 16 30 17
-let%span slib'1 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 34 16 34 63
-let%span slib'2 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 33 16 33 32
-let%span slib'3 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 32 16 32 37
-let%span slib'4 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 36 8 36 12
-let%span slib'5 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 36 15 36 16
-let%span slib'6 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 36 8 36 16
-let%span slib'7 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 37 13 37 14
-let%span slib'8 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 37 8 37 14
-let%span slib'9 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 25 11 25 23
-let%span slib'10 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 26 10 26 33
-let%span slib'11 = "/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 27 10 27 66
-let%span sslice = "/Users/ugo/Info_projet_perso/creusot/creusot-std/src/std/slice.rs" 331 18 331 22
-let%span sord = "/Users/ugo/Info_projet_perso/creusot/creusot-std/src/logic/ord.rs" 22 8 22 20
+let%span slib = "src/lib.rs" 31 14 31 21
+let%span slib'0 = "src/lib.rs" 32 16 32 17
+let%span slib'1 = "src/lib.rs" 36 16 36 63
+let%span slib'2 = "src/lib.rs" 35 16 35 32
+let%span slib'3 = "src/lib.rs" 34 16 34 37
+let%span slib'4 = "src/lib.rs" 38 8 38 12
+let%span slib'5 = "src/lib.rs" 38 15 38 16
+let%span slib'6 = "src/lib.rs" 38 8 38 16
+let%span slib'7 = "src/lib.rs" 39 13 39 14
+let%span slib'8 = "src/lib.rs" 39 8 39 14
+let%span slib'9 = "src/lib.rs" 27 11 27 23
+let%span slib'10 = "src/lib.rs" 28 10 28 33
+let%span slib'11 = "src/lib.rs" 29 10 29 66
+let%span sslice = "../../creusot/creusot-std/src/std/slice.rs" 331 18 331 22
+let%span sord = "../../creusot/creusot-std/src/logic/ord.rs" 22 8 22 20
 
 use creusot.slice.Slice64
 use creusot.int.UInt8
@@ -42,8 +42,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let zero_slice [#"/Users/ugo/Info_projet_perso/projects/phy-trng/src/lib.rs" 28 0 28 31]
-  (v: MutBorrow.t (Slice64.slice UInt8.t)) (return (x: ())) =
+let zero_slice [#"src/lib.rs" 30 0 30 31] (v: MutBorrow.t (Slice64.slice UInt8.t)) (return (x: ())) =
 {[@stop_split] [@expl:zero_slice requires] [%#slib'9] gt_log_Int (Seq.length (Slice64.view v.current)) 0}
   (! bb0
   [ bb0 = s0

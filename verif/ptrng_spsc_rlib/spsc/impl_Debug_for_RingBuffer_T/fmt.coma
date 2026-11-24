@@ -1,0 +1,162 @@
+(* #"crates/ptrng-spsc/src/spsc.rs" 21 9 21 14 *)
+
+(* <spsc::RingBuffer<T, N> as core::fmt::Debug> *)
+
+let%span sfmt = "../../creusot/creusot-std/src/std/fmt.rs" 37 20 37 24
+let%span sinvariant = "../../creusot/creusot-std/src/invariant.rs" 93 20 93 44
+let%span sinvariant'0 = "../../creusot/creusot-std/src/invariant.rs" 85 8 85 18
+let%span sspsc = "crates/ptrng-spsc/src/spsc.rs" 21 9 21 14
+let%span sspsc'0 = "crates/ptrng-spsc/src/spsc.rs" 23 4 23 16
+let%span sspsc'1 = "crates/ptrng-spsc/src/spsc.rs" 24 4 24 11
+let%span sspsc'2 = "crates/ptrng-spsc/src/spsc.rs" 25 4 25 15
+let%span sspsc'3 = "crates/ptrng-spsc/src/spsc.rs" 26 4 26 15
+let%span sspsc'4 = "crates/ptrng-spsc/src/spsc.rs" 59 20 59 64
+let%span sord = "../../creusot/creusot-std/src/logic/ord.rs" 22 8 22 20
+let%span sarray = "../../creusot/creusot-std/src/std/array.rs" 9 20 9 51
+let%span sseq = "../../creusot/creusot-std/src/logic/seq.rs" 994 20 994 91
+
+use creusot.slice.Slice64
+use creusot.int.UInt64
+use creusot.prelude.MutBorrow
+use creusot.prelude.Any
+use seq.Seq
+use int.Int
+
+type t_T
+
+type t_RingBuffer_T = { buf: Slice64.array t_T; fill: t_T; head: UInt64.t; len: UInt64.t }
+
+type dyn_Debug
+
+function dyn_Debug_of_array_T_n (x: Slice64.array t_T) : dyn_Debug
+
+function dyn_Debug_of_T (x: t_T) : dyn_Debug
+
+function dyn_Debug_of_usize (x: UInt64.t) : dyn_Debug
+
+function dyn_Debug_of_ref_usize (x: UInt64.t) : dyn_Debug
+
+type t_Formatter
+
+predicate inv_Formatter (_1: t_Formatter)
+
+type t_Result_unit_Error = Ok () | Err ()
+
+predicate invariant_refmut_Formatter [@inline:trivial] (self: MutBorrow.t t_Formatter) =
+  [%#sinvariant] inv_Formatter self.current /\ inv_Formatter self.final
+
+meta "rewrite_def" predicate invariant_refmut_Formatter
+
+predicate inv_refmut_Formatter [@inline:trivial] (_1: MutBorrow.t t_Formatter) = invariant_refmut_Formatter _1
+
+meta "rewrite_def" predicate inv_refmut_Formatter
+
+let debug_struct_field4_finish (self_: MutBorrow.t t_Formatter) (name: string) (name1: string) (value1: dyn_Debug)
+  (name2: string) (value2: dyn_Debug) (name3: string) (value3: dyn_Debug) (name4: string) (value4: dyn_Debug)
+  (return (x: t_Result_unit_Error)) =
+{[@stop_split] [@expl:debug_struct_field4_finish 'self_' type invariant] [%#sfmt] inv_refmut_Formatter self_}
+  any [ return (result: t_Result_unit_Error) -> (! return {result}) ]
+
+predicate resolve_refmut_Formatter [@inline:trivial] (_1: MutBorrow.t t_Formatter) = _1.final = _1.current
+
+meta "rewrite_def" predicate resolve_refmut_Formatter
+
+predicate gt_log_Int [@inline:trivial] (self: int) (other: int) = [%#sord] other < self
+
+meta "rewrite_def" predicate gt_log_Int
+
+constant const_N [#"crates/ptrng-spsc/src/spsc.rs" 22 25 22 39] : UInt64.t
+
+predicate invariant_RingBuffer_T [#"crates/ptrng-spsc/src/spsc.rs" 58 4 58 30] (self: t_RingBuffer_T) =
+  [%#sspsc'4] gt_log_Int (UInt64.t'int const_N) 0
+  /\ UInt64.t'int self.head < UInt64.t'int const_N /\ UInt64.t'int self.len <= UInt64.t'int const_N
+
+predicate inv_T (_1: t_T)
+
+predicate invariant_ref_T [@inline:trivial] (self: t_T) = [%#sinvariant'0] inv_T self
+
+meta "rewrite_def" predicate invariant_ref_T
+
+predicate inv_ref_T [@inline:trivial] (_1: t_T) = invariant_ref_T _1
+
+meta "rewrite_def" predicate inv_ref_T
+
+predicate invariant_Seq_T [@inline:trivial] (self: Seq.seq t_T) =
+  [%#sseq] forall i: int. 0 <= i /\ i < Seq.length self -> inv_ref_T (Seq.get self i)
+
+meta "rewrite_def" predicate invariant_Seq_T
+
+predicate inv_Seq_T [@inline:trivial] (_1: Seq.seq t_T) = invariant_Seq_T _1
+
+meta "rewrite_def" predicate inv_Seq_T
+
+predicate invariant_array_T_n (self: Slice64.array t_T) =
+  [%#sarray] inv_Seq_T (Slice64.view self) /\ Seq.length (Slice64.view self) = UInt64.t'int const_N
+
+predicate inv_array_T_n [@inline:trivial] (_1: Slice64.array t_T) = invariant_array_T_n _1
+
+meta "rewrite_def" predicate inv_array_T_n
+
+predicate inv_RingBuffer_T (_1: t_RingBuffer_T)
+
+axiom inv_axiom [@rewrite]: forall x: t_RingBuffer_T [inv_RingBuffer_T x]. inv_RingBuffer_T x
+    = (invariant_RingBuffer_T x /\ inv_array_T_n x.buf /\ inv_T x.fill)
+
+predicate invariant_ref_RingBuffer_T [@inline:trivial] (self: t_RingBuffer_T) = [%#sinvariant'0] inv_RingBuffer_T self
+
+meta "rewrite_def" predicate invariant_ref_RingBuffer_T
+
+predicate inv_ref_RingBuffer_T [@inline:trivial] (_1: t_RingBuffer_T) = invariant_ref_RingBuffer_T _1
+
+meta "rewrite_def" predicate inv_ref_RingBuffer_T
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let fmt_RingBuffer_T [#"crates/ptrng-spsc/src/spsc.rs" 21 9 21 14] (self: t_RingBuffer_T) (f: MutBorrow.t t_Formatter)
+  (return (x: t_Result_unit_Error)) =
+{[@stop_split] [@expl:fmt_RingBuffer_T requires] ([@stop_split] [@expl:fmt 'self' type invariant] [%#sspsc] inv_ref_RingBuffer_T self)
+  /\ ([@stop_split] [@expl:fmt 'f' type invariant] [%#sspsc] inv_refmut_Formatter f)}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_5 <- [%#sspsc] "RingBuffer" ] s1
+    | s1 = [ &_7 <- [%#sspsc'0] "buf" ] s2
+    | s2 = [ &_10 <- self.buf ] s3
+    | s3 = [ &_8 <- dyn_Debug_of_array_T_n _10 ] s4
+    | s4 = [ &_12 <- [%#sspsc'1] "fill" ] s5
+    | s5 = [ &_15 <- self.fill ] s6
+    | s6 = [ &_13 <- dyn_Debug_of_T _15 ] s7
+    | s7 = [ &_17 <- [%#sspsc'2] "head" ] s8
+    | s8 = [ &_20 <- self.head ] s9
+    | s9 = [ &_18 <- dyn_Debug_of_usize _20 ] s10
+    | s10 = [ &_22 <- [%#sspsc'3] "len" ] s11
+    | s11 = [ &_25 <- self.len ] s12
+    | s12 = [ &_23 <- dyn_Debug_of_ref_usize _25 ] s13
+    | s13 = MutBorrow.borrow_final <t_Formatter> {f.current} {MutBorrow.get_id f}
+        (fun (_bor: MutBorrow.t t_Formatter) ->
+          [ &_3 <- _bor ] -{inv_Formatter _bor.final}-
+          [ &f <- { f with current = _bor.final } ] s14)
+      [ _ck -> (! {[@expl:type invariant] inv_Formatter f.current} any) ]
+    | s14 = debug_struct_field4_finish [%#sspsc] {_3} {_5} {_7} {_8} {_12} {_13} {_17} {_18} {_22} {_23}
+        (fun (_x: t_Result_unit_Error) -> [ &_ret <- _x ] s15)
+    | s15 = s16 [ _ck -> (! {[@expl:type invariant] inv_refmut_Formatter f} any) ]
+    | s16 = -{resolve_refmut_Formatter f}- s17
+    | s17 = return {_ret} ] ]
+  [ & _ret: t_Result_unit_Error = Any.any_l ()
+  | & self: t_RingBuffer_T = self
+  | & f: MutBorrow.t t_Formatter = f
+  | & _3: MutBorrow.t t_Formatter = Any.any_l ()
+  | & _5: string = Any.any_l ()
+  | & _7: string = Any.any_l ()
+  | & _8: dyn_Debug = Any.any_l ()
+  | & _10: Slice64.array t_T = Any.any_l ()
+  | & _12: string = Any.any_l ()
+  | & _13: dyn_Debug = Any.any_l ()
+  | & _15: t_T = Any.any_l ()
+  | & _17: string = Any.any_l ()
+  | & _18: dyn_Debug = Any.any_l ()
+  | & _20: UInt64.t = Any.any_l ()
+  | & _22: string = Any.any_l ()
+  | & _23: dyn_Debug = Any.any_l ()
+  | & _25: UInt64.t = Any.any_l () ]) [ return (result: t_Result_unit_Error) -> (! return {result}) ]

@@ -17,6 +17,8 @@
 
 use creusot_std::prelude::*;
 
+// - functions section                                                      - //
+
 /// Overwrites every byte of `v` with zero.
 ///
 /// The attributes below are the normative specification: `v` must be
@@ -38,10 +40,15 @@ pub fn zero_slice(v: &mut [u8]) {
     }
 }
 
+// -------------------------------------------------------------------------- //
+// - tests                                                                  - //
+// -------------------------------------------------------------------------- //
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // - functions section                                                  - //
 
     #[test]
     fn test_zero_slice() {

@@ -17,7 +17,7 @@ entries below are maintained by review.
 | ID | Assumption | Justification | Owner |
 | --- | --- | --- | --- |
 | T-TOOL-1 | Creusot's translation from Rust to Coma preserves the semantics of the compiled program. | Upstream tool trust. Mitigated by pinning the exact commit (`tools/toolchains.toml`) and by replaying proofs from a clean checkout. | Build owner |
-| T-TOOL-2 | Why3, Why3find and the four selected solvers are sound. | Upstream tool trust. Four independent solvers are configured, which reduces but does not remove the exposure. | Build owner |
+| T-TOOL-2 | Why3, Why3find and the three selected solvers (`alt-ergo`, `z3`, `cvc5`) are sound. | Upstream tool trust. Three independent solvers are configured, which reduces but does not remove the exposure. | Build owner |
 | T-TOOL-3 | The `creusot-std` contracts for `core` and `std` items are correct. They are *specifications of* the standard library, not proofs about it. | Upstream contract-library trust, pinned to the same Creusot commit. Each newly relied-upon contract should be read, not assumed. | Creusot owner |
 | T-TOOL-4 | Verus, its `vstd` and its bundled solver are sound. | Not yet applicable: no Verus installation is pinned. Becomes active when `[verus]` in `tools/toolchains.toml` is populated. | Build owner |
 

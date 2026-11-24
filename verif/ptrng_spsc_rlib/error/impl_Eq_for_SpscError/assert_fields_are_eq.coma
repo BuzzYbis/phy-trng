@@ -1,0 +1,15 @@
+(* #"crates/ptrng-spsc/src/error.rs" 8 40 8 42 *)
+
+(* <error::SpscError as core::cmp::Eq> *)
+
+use creusot.prelude.Any
+
+type t_SpscError = Full
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let assert_fields_are_eq_SpscError [#"crates/ptrng-spsc/src/error.rs" 8 40 8 42] (self: t_SpscError) (return (x: ())) =
+(! bb0
+  [ bb0 = return {_ret} ] [ & _ret: () = Any.any_l () ]) [ return (result: ()) -> (! return {result}) ]

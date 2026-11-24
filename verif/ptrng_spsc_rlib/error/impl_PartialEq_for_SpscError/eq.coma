@@ -1,0 +1,31 @@
+(* #"crates/ptrng-spsc/src/error.rs" 8 29 8 38 *)
+
+(* <error::SpscError as core::cmp::PartialEq> *)
+
+let%span serror = "crates/ptrng-spsc/src/error.rs" 8 29 8 38
+let%span serror'0 = "crates/ptrng-spsc/src/error.rs" 23 8 23 12
+let%span smodel = "../../creusot/creusot-std/src/model.rs" 37 8 37 28
+
+use creusot.prelude.Any
+
+type t_SpscError = Full
+
+function deep_model_SpscError [#"crates/ptrng-spsc/src/error.rs" 22 4 22 31] (self: t_SpscError) : t_SpscError =
+  [%#serror'0] self
+
+function deep_model_ref_SpscError [@inline:trivial] (self: t_SpscError) : t_SpscError =
+  [%#smodel] deep_model_SpscError self
+
+meta "rewrite_def" function deep_model_ref_SpscError
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let eq_SpscError [#"crates/ptrng-spsc/src/error.rs" 8 29 8 38] (self: t_SpscError) (rhs: t_SpscError)
+  (return (x: bool)) = (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- [%#serror] true ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l () | & self: t_SpscError = self | & rhs: t_SpscError = rhs ])
+  [ return (result: bool) -> {[@stop_split] [@expl:eq ensures] [%#serror] result
+    = (deep_model_ref_SpscError self = deep_model_ref_SpscError rhs)}
+    (! return {result}) ]

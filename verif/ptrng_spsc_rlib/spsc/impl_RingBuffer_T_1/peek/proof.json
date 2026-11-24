@@ -1,0 +1,9 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_is_empty_T": { "prover": "alt-ergo", "time": 0.014 },
+      "vc_peek_T": { "prover": "alt-ergo", "time": 0.022 }
+    }
+  }
+}

@@ -45,6 +45,9 @@ version = "0.1.0"
 [[package]]
 name = "ptrng-spsc"
 version = "0.1.0"
+dependencies = [
+ "creusot-std",
+]
 
 [[package]]
 name = "quote"

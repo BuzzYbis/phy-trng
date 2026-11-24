@@ -47,7 +47,7 @@ rather than invented alongside it.
 | `verif/`, `.why3find/` | Creusot's own output and prover cache | **Preserved in obligations.** `verif/phy_trng_rlib/zero_slice.coma` updated span line numbers to match the doc-comment additions in `src/lib.rs`, without changing the proof obligations; not relocated into `proofs/`, per policy. |
 | `crates/driver-api/` | Plain `no_std` transport types, numeric tags, protocol constants | **Scaffolding.** Manifest, scope rules, `#![no_std]`, `#![forbid(unsafe_code)]`, and crate doc comment; zero dependencies. The earlier generated implementation and 21 tests were removed under section 0; implementation will be written by hand against `proofs/contracts/frame-handoff.md`. |
 | `crates/ptrng-core/` | Errors, amounts, epochs, identifiers, budget models (ARCHITECTURE §10) | **Scaffolding.** Manifest, scope rules and crate doc comment; no `creusot-std` dependency until the first contract. |
-| `crates/ptrng-spsc/` | Sequential ring (ARCHITECTURE §10) | **Scaffolding.** Manifest, scope rules, the M4 obligation list and the no-modulo design rule; no implementation. |
+| `crates/ptrng-spsc/` | Sequential ring (ARCHITECTURE §10) | **Implemented and proved** (assistant-implemented on owner request for owner review). Standalone `SpscError` (`Display` + `Error`) and `RingBuffer<T: Copy, const N: usize>` (`new`, `new_with`, queries, `peek`, `try_push`, `pop`, `push_slice`, `pop_slice`, `clear`); 23 Creusot `.coma` goal files discharged, 10 host tests. |
 | `crates/imx296-driver/` | IMX296 control, capture protocol, buffer lifecycle | **Deferred** — see section 2. |
 | `crates/camera-mmio/` | Volatile primitives, platform memory operations | **Deferred.** |
 | `crates/sel4-camera-pd/` | Camera PD entry points | **Deferred.** |
@@ -85,11 +85,11 @@ artifacts that the setup policy does not. Their state:
 | Reproducible toy proof and harness | **Applied** for Creusot (`zero_slice`, `ci/prove-core.sh`). Cold/warm replay timings (M0 P4, B-VER-02) are not recorded yet. |
 | Initial assumption register | `proofs/tcb.md` exists. No independent review (B-ARG-08) is recorded. |
 | Probe verdicts P1–P5 | P4: Creusot expressiveness findings recorded in `proofs/creusot/coverage.md` (see section 2.1 below); the Verus half is blocked (`proofs/compatibility-experiment.md`). P1, P2, P3, P5: no verdict recorded. |
-| `config/profiles.toml`, build matrix | Not created. |
+| `config/profiles.toml`, build matrix | **Created (provisional M0 baseline)** in `config/profiles.toml` (`rpi4-imx296-sel4`, `host-dev`, `portable-core-cortex-m`). Target triple and construction/backend selections remain open. |
 | Benchmark JSON schema, `bench/` results, `bench/deps.toml` | Not created. |
 | `evidence/arguments/` (B-ARG records) | Not created. |
 | ADR directory | Not created. |
-| `STATE.md` (ROADMAP session discipline) | Not created. |
+| `STATE.md` (ROADMAP session discipline) | **Created** at repository root (`STATE.md`). |
 
 ## 2. Deferred packages, and what creates them
 
@@ -236,7 +236,7 @@ quietly re-scoped.
 | --- | --- |
 | One Cargo workspace for core, driver and deployment | **Provisional.** Items 2, 4 and 6 of the compatibility experiment can still force the fallback: one repository, three explicitly excluded workspaces with separate lockfiles. |
 | `resolver = "3"` | Applied, matching the root package's edition. Not a considered choice between resolver versions; it preserves current behaviour. |
-| Whether `verif/` and `.why3find/` stay tracked | Open. They are preserved until a regeneration policy exists. `REPRO-1` in `tools/toolchains.toml` records that the tracked Coma carries developer-absolute spans, so it is not stable across checkout paths. |
+| Whether `verif/` and `.why3find/` stay tracked | Open. They are preserved until a regeneration policy exists. `REPRO-1` in `tools/toolchains.toml` is partially mitigated (`--span-mode relative` removes developer-absolute `/Users/...` spans while preserving `proof.json` replay, though `creusot-std` spans still encode `../../creusot/creusot-std/...` via `REPRO-2`). |
 | Which AArch64 target triple | Open. No bare-metal target is installed; `[runtime]` is unpopulated. |
 | Whether the entropy library's dependency closure is `no_std`-clean for a PD | **Unvalidated.** Not to be claimed until item 4 passes. |
 | Arithmetic and indexing lints (`arithmetic_side_effects`, `indexing_slicing`, `integer_division`) | **Disabled (decided).** Proofs cover overflow, bounds and division only in code under mandatory obligations; section 4.1 records what is left uncovered. |

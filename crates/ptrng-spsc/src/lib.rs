@@ -1,11 +1,32 @@
 //! Bounded sequential ring buffer.
 //!
-//! Scaffolding only: no implementation yet. Scope rules and the obligation
-//! list are in `README.md`.
+//! # Scope and what this crate does not claim
 //!
-//! Creusot will own this crate. Add the `creusot-std` dependency back to
-//! `Cargo.toml` with the first contract, and add the package to `PACKAGES`
-//! in `ci/prove-core.sh` at the same time.
+//! This is a **sequential cooperative** model: one caller at a time, with no
+//! concurrency. `doc/ARCHITECTURE.md` section 10 scopes `ptrng-spsc` as the
+//! sequential ring with a sequential FIFO/ownership proof (`B-VER-07`), and
+//! `doc/M4-architecture.md` states that cross-PD ordering and hostile mutation
+//! are M6 obligations (`ptrng-xfer` / `ptrng-sync`).
+//!
+//! Every public function carries Creusot contracts discharged by
+//! `ci/prove-core.sh` and inventoried in `proofs/creusot/coverage.md`.
 
 #![no_std]
 #![forbid(unsafe_code)]
+#![cfg_attr(
+    creusot,
+    expect(
+        trivial_numeric_casts,
+        reason = "creusot-std-proc expands Pearlite integer literals as `lit as i128`"
+    )
+)]
+
+// - modules section                                                        - //
+
+mod error;
+mod spsc;
+
+// - re-exports section                                                     - //
+
+pub use error::SpscError;
+pub use spsc::RingBuffer;

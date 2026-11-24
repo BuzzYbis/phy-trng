@@ -1,0 +1,94 @@
+(* #"crates/ptrng-spsc/src/spsc.rs" 129 4 129 31 *)
+
+(* spsc::RingBuffer<T, N> *)
+
+let%span sinvariant = "../../creusot/creusot-std/src/invariant.rs" 85 8 85 18
+let%span sspsc = "crates/ptrng-spsc/src/spsc.rs" 130 8 130 9
+let%span sspsc'0 = "crates/ptrng-spsc/src/spsc.rs" 130 8 130 20
+let%span sspsc'1 = "crates/ptrng-spsc/src/spsc.rs" 129 17 129 21
+let%span sspsc'2 = "crates/ptrng-spsc/src/spsc.rs" 128 14 128 41
+let%span sspsc'3 = "crates/ptrng-spsc/src/spsc.rs" 73 12 73 86
+let%span sspsc'4 = "crates/ptrng-spsc/src/spsc.rs" 35 12 39 13
+let%span sspsc'5 = "crates/ptrng-spsc/src/spsc.rs" 59 20 59 64
+let%span sord = "../../creusot/creusot-std/src/logic/ord.rs" 22 8 22 20
+let%span sarray = "../../creusot/creusot-std/src/std/array.rs" 9 20 9 51
+let%span sseq = "../../creusot/creusot-std/src/logic/seq.rs" 994 20 994 91
+
+use creusot.slice.Slice64
+use creusot.int.UInt64
+use creusot.prelude.Any
+use seq.Seq
+use int.Int
+
+type t_T
+
+type t_RingBuffer_T = { buf: Slice64.array t_T; fill: t_T; head: UInt64.t; len: UInt64.t }
+
+constant const_N [#"crates/ptrng-spsc/src/spsc.rs" 94 14 94 28] : UInt64.t
+
+predicate gt_log_Int [@inline:trivial] (self: int) (other: int) = [%#sord] other < self
+
+meta "rewrite_def" predicate gt_log_Int
+
+predicate invariant_RingBuffer_T [#"crates/ptrng-spsc/src/spsc.rs" 58 4 58 30] (self: t_RingBuffer_T) =
+  [%#sspsc'5] gt_log_Int (UInt64.t'int const_N) 0
+  /\ UInt64.t'int self.head < UInt64.t'int const_N /\ UInt64.t'int self.len <= UInt64.t'int const_N
+
+predicate inv_T (_1: t_T)
+
+predicate invariant_ref_T [@inline:trivial] (self: t_T) = [%#sinvariant] inv_T self
+
+meta "rewrite_def" predicate invariant_ref_T
+
+predicate inv_ref_T [@inline:trivial] (_1: t_T) = invariant_ref_T _1
+
+meta "rewrite_def" predicate inv_ref_T
+
+predicate invariant_Seq_T [@inline:trivial] (self: Seq.seq t_T) =
+  [%#sseq] forall i: int. 0 <= i /\ i < Seq.length self -> inv_ref_T (Seq.get self i)
+
+meta "rewrite_def" predicate invariant_Seq_T
+
+predicate inv_Seq_T [@inline:trivial] (_1: Seq.seq t_T) = invariant_Seq_T _1
+
+meta "rewrite_def" predicate inv_Seq_T
+
+predicate invariant_array_T_n (self: Slice64.array t_T) =
+  [%#sarray] inv_Seq_T (Slice64.view self) /\ Seq.length (Slice64.view self) = UInt64.t'int const_N
+
+predicate inv_array_T_n [@inline:trivial] (_1: Slice64.array t_T) = invariant_array_T_n _1
+
+meta "rewrite_def" predicate inv_array_T_n
+
+predicate inv_RingBuffer_T (_1: t_RingBuffer_T)
+
+axiom inv_axiom [@rewrite]: forall x: t_RingBuffer_T [inv_RingBuffer_T x]. inv_RingBuffer_T x
+    = (invariant_RingBuffer_T x /\ inv_array_T_n x.buf /\ inv_T x.fill)
+
+predicate invariant_ref_RingBuffer_T [@inline:trivial] (self: t_RingBuffer_T) = [%#sinvariant] inv_RingBuffer_T self
+
+meta "rewrite_def" predicate invariant_ref_RingBuffer_T
+
+predicate inv_ref_RingBuffer_T [@inline:trivial] (_1: t_RingBuffer_T) = invariant_ref_RingBuffer_T _1
+
+meta "rewrite_def" predicate inv_ref_RingBuffer_T
+
+function slot_index_T [#"crates/ptrng-spsc/src/spsc.rs" 33 4 33 58] (head'0: int) (offset: int) (cap: int) : int =
+  [%#sspsc'4] if offset < cap - head'0 then head'0 + offset else offset - (cap - head'0)
+
+function view_RingBuffer_T [#"crates/ptrng-spsc/src/spsc.rs" 71 4 71 33] (self: t_RingBuffer_T) : Seq.seq t_T =
+  [%#sspsc'3] Seq.create (UInt64.t'int self.len) (fun (i: int) -> Seq.get (Slice64.view self.buf) (slot_index_T (UInt64.t'int self.head) i (UInt64.t'int const_N)))
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let free_T [#"crates/ptrng-spsc/src/spsc.rs" 129 4 129 31] (self: t_RingBuffer_T) (return (x: UInt64.t)) =
+{[@stop_split] [@expl:free 'self' type invariant] [%#sspsc'1] inv_ref_RingBuffer_T self}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = UInt64.sub [%#sspsc'0] {[%#sspsc] const_N} {self.len} (fun (_x: UInt64.t) -> [ &_ret <- _x ] s1)
+    | s1 = return {_ret} ] ] [ & _ret: UInt64.t = Any.any_l () | & self: t_RingBuffer_T = self ])
+  [ return (result: UInt64.t) -> {[@stop_split] [@expl:free ensures] [%#sspsc'2] UInt64.t'int result
+    = UInt64.t'int const_N - Seq.length (view_RingBuffer_T self)}
+    (! return {result}) ]

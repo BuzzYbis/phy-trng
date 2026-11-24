@@ -2,11 +2,12 @@
 
 Bounded sequential ring buffer with a proved FIFO and ownership model.
 
-Proof owner: **Creusot**. **Not implemented yet** — this crate is currently
-scaffolding: a manifest, these scope rules and a crate-level doc comment.
-Coverage is inventoried in
-[`proofs/creusot/coverage.md`](../../proofs/creusot/coverage.md), which
-records zero goals for this package today.
+Proof owner: **Creusot**. **Implemented and proved** (`23` `.coma` goal files
+discharged in [`proofs/creusot/coverage.md`](../../proofs/creusot/coverage.md)),
+covering `SpscError` (`Display` + `Error`) and generic
+`RingBuffer<T: Copy, const N: usize>` (`new` with `T: Copy + Default`, `new_with`,
+`capacity`, `len`, `free`, `is_empty`, `is_full`, `peek`, `try_push`, `pop`,
+`push_slice`, `pop_slice`, `clear`).
 
 ## Scope, and what this crate does not claim
 
@@ -22,21 +23,22 @@ memory-ordering assumptions that Creusot does not discharge. **A proof in this
 crate says nothing about those.** Using this type across a real concurrency
 boundary would be unsound, and no proof here would detect that.
 
-## Obligations to discharge
+## Obligations discharged (`B-VER-07`)
 
 From `doc/M4-architecture.md`, "Sequential buffers and extraction".
-None of these is proved yet.
+All `B-VER-07` obligations below are proved in `src/spsc.rs` and `src/error.rs`
+(re-exported from `src/lib.rs`):
 
-| Obligation | Intended mechanism |
+| Obligation | Mechanism |
 | --- | --- |
-| Capacity and length bounds | `Invariant`: `head < N`, `len <= N` |
-| Push and pop count bounds | `try_push` / `pop` postconditions on `@.len()` |
-| FIFO order | `pop` returns `@[0]`; the remainder shifts by one |
-| Initialized reads | the model has exactly `len` elements; `pop`/`peek` read only within it |
-| No unread overwrite | `try_push` on a full ring returns `Full` and leaves the model unchanged |
-| Empty and full distinguishable | the length is stored, so `head == tail` is never ambiguous |
-| Peek lifetime | `peek` returns by value, so no borrow outlives the call |
-| Panic freedom, termination | discharged with the rest; every index proved in range |
+| Capacity and length bounds | `Invariant`: `N@ > 0 && self.head@ < N@ && self.len@ <= N@` |
+| Push and pop count bounds | `try_push` / `pop` / `push_slice` / `pop_slice` postconditions on `self@.len()` and returned counts |
+| FIFO order | `pop` returns `(*self)@[0]` with `subsequence(1, len)`; `push_slice`/`pop_slice` specify `concat`/`subsequence` |
+| Initialized reads | `View` models `Seq::create(self.len@, ...)`; `peek`/`pop`/`pop_slice` read only within `len` |
+| No unread overwrite | `try_push` on a full ring returns `Err(SpscError::Full)` and leaves `self@` unchanged; `pop_slice` preserves `dst[count..]` |
+| Empty and full distinguishable | `len` is stored (`0..=N`), so `head == tail` is never ambiguous |
+| Peek lifetime | `peek` returns `Option<T>` by value (`T: Copy`), so no borrow outlives the call |
+| Panic freedom, termination | `#[check(terminates)]` + `#[variant(...)]` loops; every index proved in bounds |
 
 ## Design note: no modulo
 
@@ -54,8 +56,9 @@ also avoids a division in the emitted code.
 let tail = if len < N - head { head + len } else { len - (N - head) };
 ```
 
-## Open design question: element type
+## Element type choice (decided)
 
-`u8` matches the raw sample stream and keeps the proof simple. A generic `T`
-adds `Resolve` and `Invariant` obligations for the element. Decide before
-writing the implementation, not after.
+Implemented as generic `RingBuffer<T: Copy, const N: usize>` (`new()` requires
+`T: Copy + Default`; `new_with(fill: T)` stores `fill` so `pop`/`pop_slice`/`clear`
+scrub consumed slots without invoking `T::default()` inside proved-terminating
+methods).

@@ -1,0 +1,24 @@
+(* #"crates/ptrng-spsc/src/error.rs" 8 16 8 21 *)
+
+(* <error::SpscError as core::clone::Clone> *)
+
+let%span serror = "crates/ptrng-spsc/src/error.rs" 8 16 8 21
+
+use creusot.prelude.Any
+
+type t_SpscError = Full
+
+type tup2_SpscError_SpscError = { f0: t_SpscError; f1: t_SpscError }
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let clone_SpscError [#"crates/ptrng-spsc/src/error.rs" 8 16 8 21] (self: t_SpscError) (return (x: t_SpscError)) = (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- Full ] s1 | s1 = return {_ret} ] ] [ & _ret: t_SpscError = Any.any_l () ])
+  [ return (result: t_SpscError) -> {[@stop_split] [@expl:clone ensures] [%#serror] match { f0 = self;
+                                                                                            f1 = result } with
+      | {f0 = Full; f1 = Full} -> true
+      | _ -> false
+      end}
+    (! return {result}) ]

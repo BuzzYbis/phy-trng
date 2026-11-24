@@ -14,8 +14,8 @@
 # version matrix.
 
 [meta]
-revision = 1
-recorded = "2026-09-17"
+revision = 2
+recorded = "2026-11-24"
 # The status of each section: "observed" means the values were read from a
 # working installation; "unpopulated" means no compatibility check has run.
 creusot_status = "observed"
@@ -25,7 +25,7 @@ runtime_status = "unpopulated"
 [host]
 # Reference CI environment is Linux; this is the developer machine that
 # produced the observed Creusot values.
-developer = "Darwin 25.6.0 arm64"
+developer = "Darwin 27.2.0 arm64"
 ci_reference = ""            # Linux CI image identity, once one exists.
 container_digest = ""
 
@@ -66,9 +66,10 @@ cache_format = "v4@why3.1.8.2+git"
 
 [creusot.provers]
 # Selected in `why3find.json`, in that order.
+# Legacy `cvc4` (1.8) was removed because the bundled x86_64 binary fails on
+# `Darwin 27.2.0 arm64` with `Bad CPU type in executable (os error 86)`.
 alt_ergo = "2.6.2"
 z3 = "4.15.3"
-cvc4 = "1.8"
 cvc5 = "1.3.1"
 # A different Z3 may sit earlier on PATH (5.1.0 on the recording host). The
 # solver identity that matters is the one `cargo creusot version` reports,
@@ -111,8 +112,8 @@ linker = ""
 # ---------------------------------------------------------------------------
 
 [host_build]
-rustc = "1.98.0 (88d9e12ae 2026-08-18)"
-cargo = "1.98.0 (797e8a9bc 2026-08-05)"
+rustc = "1.100.0 (0ef1bc386 2026-11-09)"
+cargo = "1.100.0 (3acc79c0c 2026-11-05)"
 # `cargo fmt` is invoked through the nightly toolchain by the makefile.
 fmt_toolchain = "nightly"
 
@@ -121,21 +122,21 @@ fmt_toolchain = "nightly"
 # ---------------------------------------------------------------------------
 
 [reproducibility]
-cargo_lock_sha256 = "1a1e30de3ed39e459e5db20f16ba6ef69f350f9c3460784c2de5bd1eb5295853"
-why3find_json_sha256 = "80e22e33d612aa049f17b9d72e641873a6887e31371e3556d3f5dfc9e3c98c2b"
+cargo_lock_sha256 = "acc9d4bc7c5fb106869aad6ba980a265bf2a2902ccf02fe7bcf898564a599daa"
+why3find_json_sha256 = "71743a514d421f7b402f3566ef44c392fbd52c16d0f86665157c21354427425e"
 
 # Open items that block a clean-checkout replay. These are recorded defects,
 # not accepted properties.
 [[reproducibility.open_items]]
 id = "REPRO-1"
-summary = "Checked-in Coma carries developer-absolute spans"
+summary = "Creusot-std spans in checked-in Coma encode relative sibling checkout path (partially mitigated)"
 detail = """
-`verif/phy_trng_rlib/zero_slice.coma` is tracked and contains absolute paths
-under the recording host's home directory, including paths into the Creusot
-checkout. Creusot's `--span-mode relative` exists for generated code that is
-checked into version control. Switching regenerates the baseline and may
-invalidate `verif/phy_trng_rlib/zero_slice/proof.json`, so it is deferred
-until the regeneration policy for replay files is decided.
+`makefile` and `ci/prove-core.sh` now pass `--span-mode relative`, which
+eliminated all developer-absolute `/Users/...` paths from
+`verif/phy_trng_rlib/zero_slice.coma` and preserved `proof.json` replay.
+However, `creusot-std` spans still emit `../../creusot/creusot-std/...`
+because `creusot-std` resolves to a sibling source checkout (`REPRO-2`) rather
+than a stable repository or published crate location.
 """
 
 [[reproducibility.open_items]]

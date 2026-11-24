@@ -6,7 +6,7 @@ CARGO_FLAGS  := --workspace --all-features
 
 # The Creusot proof gate selects its package explicitly: `default-members` is
 # a build-target convenience, not a verifier firewall.
-CORE_PKG := phy-trng
+CORE_PKGS := phy-trng ptrng-spsc
 
 .PHONY: all fmt fmt-check clippy test cov cov-html build verify miri audit clean \
         bootstrap smoke check-trust prove-core prove-driver build-rpi4 test-hil \
@@ -65,7 +65,10 @@ miri:
 
 verify: clippy
 	@echo "==> Running Creusot formal verification..."
-	cargo creusot -- -p $(CORE_PKG) --lib
+	@for pkg in $(CORE_PKGS); do \
+		cargo creusot --span-mode relative --only=coma -- -p $$pkg --lib || exit $$?; \
+	done
+	cargo creusot --only=prove
 
 build: clippy
 	@echo "==> Compiling release artifacts..."

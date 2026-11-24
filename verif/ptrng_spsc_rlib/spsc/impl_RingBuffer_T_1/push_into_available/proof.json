@@ -1,0 +1,9 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_physical_index_T": { "prover": "alt-ergo", "time": 0.014 },
+      "vc_push_into_available_T": { "prover": "z3", "time": 0.01 }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+(* #"crates/ptrng-spsc/src/error.rs" 8 29 8 38 *)
+
+(* <error::SpscError as core::cmp::PartialEq> *)
+
+let%span serror = "crates/ptrng-spsc/src/error.rs" 8 29 8 38
+let%span serror'0 = "crates/ptrng-spsc/src/error.rs" 23 8 23 12
+let%span smodel = "../../creusot/creusot-std/src/model.rs" 37 8 37 28
+let%span scmp = "../../creusot/creusot-std/src/std/cmp.rs" 14 26 14 75
+
+type t_SpscError = Full
+
+function deep_model_SpscError [#"crates/ptrng-spsc/src/error.rs" 22 4 22 31] (self: t_SpscError) : t_SpscError =
+  [%#serror'0] self
+
+function deep_model_ref_SpscError [@inline:trivial] (self: t_SpscError) : t_SpscError =
+  [%#smodel] deep_model_SpscError self
+
+meta "rewrite_def" function deep_model_ref_SpscError
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+goal refines: forall self_: t_SpscError, rhs: t_SpscError. forall result: bool. ([%#serror] result
+        = (deep_model_ref_SpscError self_ = deep_model_ref_SpscError rhs))
+      -> ([%#scmp] result = (deep_model_ref_SpscError self_ = deep_model_ref_SpscError rhs))

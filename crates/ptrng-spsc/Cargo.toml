@@ -21,9 +21,7 @@ keywords = ["ringbuffer", "verification", "no-std", "fifo"]
 categories = ["data-structures", "no-std"]
 
 [dependencies]
-# Creusot will own this crate. `creusot-std` is added back with the first
-# contract: `cargo creusot` compiles every workspace member and rejects a
-# crate that depends on it without using it.
+creusot-std = { version = "0.14.0-dev", default-features = false }
 
 
 [lints]

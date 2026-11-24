@@ -1,0 +1,113 @@
+# Assurance and build profiles.
+#
+# Records target, deployment, construction/backend applicability, oracle, DMA
+# mode, clock/fault mechanism, active evidence and active assumptions per
+# `doc/M0-architecture.md` and `doc/BENCHMARKS.md` §5.
+#
+# Status: provisional M0 baseline — no profile is qualified yet.
+
+[meta]
+schema_version = 1
+spec_version = "0.3.1"
+status = "provisional — M0 baseline; no profile is qualified yet"
+default_reference = "rpi4-imx296-sel4"
+
+[profiles.rpi4-imx296-sel4]
+description = "Reference target: Raspberry Pi 4 + colour Sony IMX296 on seL4 Microkit"
+board = "Raspberry Pi 4 (BCM2711)"
+isa = "aarch64"
+target_triple = ""           # Unpopulated until tools/toolchains.toml [runtime] is pinned.
+sensor = "Sony IMX296 colour (1456x1088 RAW10, 60 fps target)"
+supported_scope = "provisional" # Target: "qualified" once G0-G7 pass.
+deployment = "seL4 Microkit (2-PD bring-up -> 7-PD M6 split)"
+construction_candidate = "open (G3: sponge/duplex with ratchet | Hash_DRBG | KS24 para 994-995)"
+primitive_backend = "open (G3: Keccak+Formosa | Keccak soft-primary | SHA-256)"
+formosa_applicable = "conditional (M0 P3 / frozen at G3)"
+oracle = "independent reference implementation (selected at M0 P3 / G3)"
+dma_mode = "trusted (A-DMA-1; BCM2711 lacks ARM SMMU for Unicam CSI-2 DMA)"
+clock_fault_mechanism = "open (M0 P2: monotone timer, watchdog, pd_fault routing)"
+active_evidence = [
+    "B-ARG-08",
+    "B-FOOT-04",
+    "B-FOOT-06",
+    "B-VER-02",
+    "B-VER-04",
+    "B-INT-10",
+    "B-EVD-02",
+    "B-EVD-03",
+    "B-EVD-04",
+    "B-EVD-05",
+    "B-EVD-06",
+]
+active_assumptions = [
+    "A-ACQ-1",
+    "A-DMA-1",
+    "T-TOOL-1",
+    "T-TOOL-2",
+    "T-TOOL-3",
+    "T-BUILD-1",
+    "T-BUILD-2",
+    "T-BUILD-3",
+    "T-ENV-1",
+]
+
+[profiles.host-dev]
+description = "Host verification and unit-test profile (non-deployable)"
+board = "host"
+isa = "host"
+target_triple = "aarch64-apple-darwin"
+sensor = "none (host unit tests / mocks only)"
+supported_scope = "host-verification-only"
+deployment = "none"
+construction_candidate = "not_applicable"
+primitive_backend = "not_applicable"
+formosa_applicable = "not_applicable"
+oracle = "not_applicable"
+dma_mode = "not_applicable"
+clock_fault_mechanism = "not_applicable"
+active_evidence = [
+    "B-FOOT-06",
+    "B-VER-02",
+    "B-VER-04",
+    "B-EVD-03",
+    "B-EVD-05",
+]
+active_assumptions = [
+    "T-TOOL-1",
+    "T-TOOL-2",
+    "T-TOOL-3",
+    "T-BUILD-1",
+    "T-BUILD-2",
+    "T-ENV-1",
+]
+
+[profiles.portable-core-cortex-m]
+description = "Compile-only portable core profile (does not claim full camera/seL4 system support; ARCHITECTURE §3)"
+board = "none (portable core build target only)"
+isa = "thumbv7em-none-eabihf"
+target_triple = "thumbv7em-none-eabihf"
+sensor = "not_applicable"
+supported_scope = "compile-only"
+deployment = "none (no_std core library only)"
+construction_candidate = "open (inherits core selection at G3)"
+primitive_backend = "open (inherits core selection at G3)"
+formosa_applicable = "conditional (inherits core selection at G3)"
+oracle = "independent reference implementation"
+dma_mode = "not_applicable"
+clock_fault_mechanism = "not_applicable"
+active_evidence = [
+    "B-FOOT-04",
+    "B-FOOT-06",
+    "B-VER-02",
+    "B-EVD-03",
+    "B-EVD-05",
+]
+active_assumptions = [
+    "T-TOOL-1",
+    "T-TOOL-2",
+    "T-TOOL-3",
+    "T-BUILD-1",
+    "T-BUILD-2",
+    "T-BUILD-3",
+    "T-ENV-1",
+]
